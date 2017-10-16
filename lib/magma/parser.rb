@@ -60,13 +60,19 @@ module Magma
         restore
         return
       end
+      block = AST::Block.new
+      loop do
+        statement = parse_statement
+        break if statement.nil?
+        block.add_statement(statement)
+      end
       rparen = accept(:trbrace)
       if rparen.nil?
         restore
         return
       end
       commit
-      AST::Block.new
+      block
     end
 
     def parse_function
@@ -91,6 +97,49 @@ module Magma
       end
       commit
       AST::Function.new(id.str, b)
+    end
+
+    def parse_statement
+      statement = nil
+      statement ||= parse_statement_expr
+      statement
+    end
+
+    def parse_statement_expr
+      e = parse_expr
+      return if e.nil?
+      save
+      unless accept(:tsemicolon)
+        restore
+        return
+      end
+      commit
+      AST::StatementExpr.new(e)
+    end
+
+    def parse_expr
+      expr = nil
+      expr ||= parse_expr_call
+      expr
+    end
+
+    def parse_expr_call
+      save
+      id = accept(:identifier)
+      if id.nil?
+        restore
+        return
+      end
+      unless accept(:tlparen)
+        restore
+        return
+      end
+      unless accept(:trparen)
+        restore
+        return
+      end
+      commit
+      AST::ExprCall.new(id.str)
     end
   end
 end

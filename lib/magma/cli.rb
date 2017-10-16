@@ -1,5 +1,6 @@
 require 'magma/scanner'
 require 'magma/parser'
+require 'magma/error_reporter'
 
 module Magma
   class CLI
@@ -13,12 +14,17 @@ module Magma
         exit 1
       end
       f = File.open(filename, 'rb')
-      scanner = Scanner.new(filename, f)
-      parser = Parser.new(scanner)
+      reporter = ErrorReporter.new
+      scanner = Scanner.new(filename, f, reporter)
+      parser = Parser.new(scanner, reporter)
       ast = parser.parse
       f.close
-      ap parser.tokens
-      ap ast
+      if reporter.error?
+        reporter.report
+      else
+        ap parser.tokens
+        ap ast
+      end
     end
 
     def self.run(args)

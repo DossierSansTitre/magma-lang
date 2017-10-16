@@ -19,9 +19,10 @@ module Magma
       ';'   => :tsemicolon
     }
 
-    def initialize(filename, stream)
+    def initialize(filename, stream, reporter)
       @filename = filename
       @stream = stream
+      @reporter = reporter
       @rollback = []
       @line = 1
       @column = 1

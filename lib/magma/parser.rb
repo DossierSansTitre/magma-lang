@@ -4,8 +4,9 @@ module Magma
   class Parser
     attr_reader :tokens
 
-    def initialize(scanner)
+    def initialize(scanner, reporter)
       @scanner = scanner
+      @reporter = reporter
       @ast = AST::Root.new
       @tokens = []
       @index = 0
@@ -18,6 +19,10 @@ module Magma
         if (node = parse_function)
           @ast.add_function(node)
           next
+        end
+        t = pop_token
+        unless t.nil?
+          @reporter.error("Unexpected token, expected EOF", t.source_loc)
         end
         break
       end

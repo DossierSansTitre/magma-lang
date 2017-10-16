@@ -12,7 +12,7 @@ module Magma
         exit 1
       end
       f = File.open(filename, 'rb')
-      scanner = Scanner.new(f)
+      scanner = Scanner.new(filename, f)
       tokens = []
       loop do
         t = scanner.next_token

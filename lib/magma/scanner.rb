@@ -1,3 +1,4 @@
+require 'magma/source_loc'
 require 'magma/token'
 
 module Magma
@@ -16,9 +17,12 @@ module Magma
       '->'  => :tarrow
     }
 
-    def initialize(stream)
+    def initialize(filename, stream)
+      @filename = filename
       @stream = stream
       @rollback = []
+      @line = 1
+      @column = 1
     end
 
     def next_token
@@ -32,10 +36,12 @@ module Magma
 
     private
     def stream_getc
+      @column += 1
       @rollback.shift || @stream.getc
     end
 
     def stream_putc(c)
+      @column -= 1
       @rollback.unshift c
     end
 
@@ -59,6 +65,10 @@ module Magma
     def skip_ws
       loop do
         c = stream_getc
+        if c == "\n"
+          @line += 1
+          @column = 1
+        end
         unless [" ", "\n", "\t", "\v", "\f"].include?(c)
           stream_putc c
           break
@@ -110,21 +120,28 @@ module Magma
     end
 
     def scan_keyword
+      loc = source_loc
       k = keyword
       return nil if k.nil?
-      Token.new(k)
+      Token.new(k, loc)
     end
 
     def scan_identifier
+      loc = source_loc
       id = identifier
       return nil if id.nil?
-      TokenString.new(:identifier, id)
+      TokenString.new(:identifier, id, loc)
     end
 
     def scan_symbol
+      loc = source_loc
       s = symbol
       return nil if s.nil?
-      Token.new(s)
+      Token.new(s, loc)
+    end
+
+    def source_loc
+      SourceLoc.new(@filename, @line, @column)
     end
   end
 end

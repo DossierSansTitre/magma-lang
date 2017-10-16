@@ -1,4 +1,5 @@
 require 'magma/scanner'
+require 'magma/parser'
 
 module Magma
   class CLI
@@ -13,14 +14,8 @@ module Magma
       end
       f = File.open(filename, 'rb')
       scanner = Scanner.new(filename, f)
-      tokens = []
-      loop do
-        t = scanner.next_token
-        break if t.nil?
-        tokens << t
-      end
-      f.close
-      ap tokens
+      parser = Parser.new(scanner)
+      ap parser.parse
     end
 
     def self.run(args)

@@ -1,4 +1,4 @@
 fun test() {
     foo();
-    bar(); baz();
+    bar(a(), b(), c()); baz(a());
 }

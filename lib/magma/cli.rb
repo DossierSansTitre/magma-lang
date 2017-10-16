@@ -15,7 +15,10 @@ module Magma
       f = File.open(filename, 'rb')
       scanner = Scanner.new(filename, f)
       parser = Parser.new(scanner)
-      ap parser.parse
+      ast = parser.parse
+      f.close
+      ap parser.tokens
+      ap ast
     end
 
     def self.run(args)

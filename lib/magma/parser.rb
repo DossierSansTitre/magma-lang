@@ -2,11 +2,14 @@ require 'magma/ast'
 
 module Magma
   class Parser
+    attr_reader :tokens
+
     def initialize(scanner)
       @scanner = scanner
       @ast = AST::Root.new
-      @rollback = []
-      @save = [[]]
+      @tokens = []
+      @index = 0
+      @save = []
     end
 
     def parse
@@ -22,13 +25,16 @@ module Magma
     end
 
     private
-    def push_token(tok)
-      @rollback.unshift(tok)
+    def push_token
+      @index -= 1
     end
 
     def pop_token
-      t = @rollback.shift || @scanner.next_token
-      @save.last.unshift(t)
+      if @index >= @tokens.size
+        @tokens.push(@scanner.next_token)
+      end
+      t = @tokens[@index]
+      @index += 1
       t
     end
 
@@ -36,17 +42,16 @@ module Magma
       t = pop_token
       return if t.nil?
       return t if t.type == type
-      push_token(t)
+      push_token
       nil
     end
 
     def save
-      @save.push([])
+      @save.push(@index)
     end
 
     def restore
-      @save.last.each{|t| push_token(t)}
-      commit
+      @index = @save.pop
     end
 
     def commit
@@ -134,12 +139,19 @@ module Magma
         restore
         return
       end
+      call = AST::ExprCall.new(id.str)
+      loop do
+        e = parse_expr
+        break if e.nil?
+        call.add_argument(e)
+        break unless accept(:tcolon)
+      end
       unless accept(:trparen)
         restore
         return
       end
       commit
-      AST::ExprCall.new(id.str)
+      call
     end
   end
 end

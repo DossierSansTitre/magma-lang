@@ -15,6 +15,7 @@ module Magma
       '{'   => :tlbrace,
       '}'   => :trbrace,
       '->'  => :tarrow,
+      ','   => :tcolon,
       ';'   => :tsemicolon
     }
 

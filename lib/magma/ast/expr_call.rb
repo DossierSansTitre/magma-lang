@@ -5,6 +5,15 @@ module Magma
     class ExprCall < Node
       def initialize(func_name)
         @func_name = func_name
+        @arguments = []
+      end
+
+      def add_argument(arg)
+        @arguments << arg
+      end
+
+      def children
+        @arguments
       end
 
       def dump(indent = 0)

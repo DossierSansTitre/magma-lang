@@ -3,17 +3,21 @@ require 'magma/ast/block'
 module Magma
   module AST
     class Function < Node
-      def initialize(name, block)
+      attr_writer :type
+      attr_writer :block
+
+      def initialize(name)
         @name = name
-        @block = block
+        @block = nil
+        @type = "Void"
       end
 
       def children
-        [@block]
+        [@block].reject(&:nil?)
       end
 
       def dump(indent)
-        super(indent, @name)
+        super(indent, "#{@name} -> #{@type}")
       end
     end
   end

@@ -100,13 +100,19 @@ module Magma
         restore
         return
       end
+      function = AST::Function.new(id.str)
+      if accept(:tarrow)
+        type = accept(:identifier)
+        function.type = type.str
+      end
       b = parse_block
       if b.nil?
         restore
         return
       end
       commit
-      AST::Function.new(id.str, b)
+      function.block = b
+      function
     end
 
     def parse_statement

@@ -136,6 +136,7 @@ module Magma
     def parse_expr
       expr = nil
       expr ||= parse_expr_call
+      expr ||= parse_expr_literal
       expr
     end
 
@@ -163,6 +164,17 @@ module Magma
       end
       commit
       call
+    end
+
+    def parse_expr_literal
+      save
+      num = accept(:number)
+      if num.nil?
+        restore
+        return
+      end
+      commit
+      AST::ExprLiteral.new("Int", num.number)
     end
   end
 end

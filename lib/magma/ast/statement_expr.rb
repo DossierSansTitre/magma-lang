@@ -1,5 +1,6 @@
 require 'magma/ast/node'
 require 'magma/ast/expr_call'
+require 'magma/ast/expr_literal'
 
 module Magma
   module AST

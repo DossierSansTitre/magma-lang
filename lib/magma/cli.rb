@@ -1,6 +1,7 @@
 require 'magma/scanner'
 require 'magma/parser'
 require 'magma/error_reporter'
+require 'magma/codegen'
 
 module Magma
   class CLI
@@ -24,6 +25,10 @@ module Magma
       else
         ap parser.tokens
         ap ast
+        out_filename = File.basename(filename, File.extname(filename)) + '.o'
+        out_file = File.open(out_filename, "wb")
+        codegen = Codegen.new(ast, out_file)
+        out_file.close
       end
     end
 

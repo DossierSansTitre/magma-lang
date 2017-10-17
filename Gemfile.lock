@@ -2,12 +2,18 @@ GEM
   remote: https://rubygems.org/
   specs:
     awesome_print (1.8.0)
+    ffi (1.9.18)
+    rake (10.5.0)
+    ruby-llvm (3.5.0)
+      ffi (~> 1.9.3)
+      rake (~> 10.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   awesome_print!
+  ruby-llvm (~> 3.5.0)!
 
 BUNDLED WITH
    1.15.4

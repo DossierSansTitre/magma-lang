@@ -1,5 +1,6 @@
 require 'magma/ast/node'
 require 'magma/ast/statement_expr'
+require 'magma/ast/statement_return'
 
 module Magma
   module AST

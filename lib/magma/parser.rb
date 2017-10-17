@@ -117,6 +117,7 @@ module Magma
 
     def parse_statement
       statement = nil
+      statement ||= parse_statement_return
       statement ||= parse_statement_expr
       statement
     end
@@ -131,6 +132,21 @@ module Magma
       end
       commit
       AST::StatementExpr.new(e)
+    end
+
+    def parse_statement_return
+      save
+      unless accept(:kreturn)
+        restore
+        return
+      end
+      e = parse_expr
+      unless accept(:tsemicolon)
+        restore
+        return
+      end
+      commit
+      AST::StatementReturn.new(e)
     end
 
     def parse_expr

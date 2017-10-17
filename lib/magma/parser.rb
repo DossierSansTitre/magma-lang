@@ -149,7 +149,7 @@ module Magma
         e = parse_expr
         break if e.nil?
         call.add_argument(e)
-        break unless accept(:tcolon)
+        break unless accept(:tcomma)
       end
       unless accept(:trparen)
         restore

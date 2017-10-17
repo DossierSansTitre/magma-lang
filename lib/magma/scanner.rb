@@ -3,10 +3,12 @@ require 'magma/token'
 
 module Magma
   class Scanner
-    IDENTIFIER = /\A[a-zA-Z_][a-zA-Z0-9_]*\z/
+    IDENTIFIER  = /\A[a-zA-Z_][a-zA-Z0-9_]*\z/
+    NUMBER      = /\A(\+|-)?[0-9]+\z/
 
     KEYWORDS = {
-      'fun' => :kfun
+      'fun'     => :kfun,
+      'return'  => :kreturn
     }
 
     SYMBOLS = {
@@ -35,6 +37,7 @@ module Magma
       tok ||= scan_symbol
       tok ||= scan_keyword
       tok ||= scan_identifier
+      tok ||= scan_number
       tok
     end
 
@@ -80,22 +83,30 @@ module Magma
       end
     end
 
-    def identifier
+    def scan_regex(regex)
       id = stream_getc
-      unless IDENTIFIER =~ id
+      unless regex =~ id
         stream_putc id
-        return nil
+        return
       end
       loop do
         c = stream_getc
         tmp = id + c
-        unless IDENTIFIER =~ tmp
+        unless regex =~ tmp
           stream_putc c
           break
         end
         id = tmp
       end
       id
+    end
+
+    def identifier
+      scan_regex(IDENTIFIER)
+    end
+
+    def number
+      scan_regex(NUMBER)
     end
 
     def keyword
@@ -126,21 +137,28 @@ module Magma
     def scan_keyword
       loc = source_loc
       k = keyword
-      return nil if k.nil?
+      return if k.nil?
       Token.new(k, loc)
     end
 
     def scan_identifier
       loc = source_loc
       id = identifier
-      return nil if id.nil?
+      return if id.nil?
       TokenString.new(:identifier, id, loc)
+    end
+
+    def scan_number
+      loc = source_loc
+      num = number
+      return if num.nil?
+      TokenNumber.new(:number, num, loc)
     end
 
     def scan_symbol
       loc = source_loc
       s = symbol
-      return nil if s.nil?
+      return if s.nil?
       Token.new(s, loc)
     end
 

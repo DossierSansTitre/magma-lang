@@ -13,6 +13,7 @@ PLATFORMS
 
 DEPENDENCIES
   awesome_print!
+  rake!
   ruby-llvm (~> 3.5.0)!
 
 BUNDLED WITH

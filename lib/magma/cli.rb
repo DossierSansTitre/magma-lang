@@ -2,15 +2,17 @@ require 'magma/scanner'
 require 'magma/parser'
 require 'magma/error_reporter'
 require 'magma/codegen'
+require 'magma/driver'
+require 'magma/compiler_driver'
 
 module Magma
   class CLI
     def initialize(args)
-      @args = args
+      @driver = Driver.new(args)
     end
 
     def exec
-      filename = @args.shift
+      filename = @driver.input.first
       if filename.nil?
         exit 1
       end
@@ -20,14 +22,24 @@ module Magma
       parser = Parser.new(scanner, reporter)
       ast = parser.parse
       f.close
+
       if reporter.error?
         reporter.report
+        return
+      end
+      ap parser.tokens
+      ap ast
+      obj_filename = nil
+      if @driver.opts[:object]
+        obj_filename = @driver.output
       else
-        ap parser.tokens
-        ap ast
-        out_filename = File.basename(filename, File.extname(filename)) + '.o'
-        codegen = Codegen.new(ast, out_filename)
-        codegen.generate
+        obj_filename = Dir::Tmpname.create(['magma-', '.o']) { }
+      end
+      codegen = Codegen.new(ast, obj_filename)
+      codegen.generate
+      unless @driver.opts[:object]
+        cc = CompilerDriver.new
+        cc.compile([File.join(File.dirname(__FILE__), '..', '..', 'libexec', 'magma_rt.o'), obj_filename], @driver.output)
       end
     end
 

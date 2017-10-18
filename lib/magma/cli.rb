@@ -26,9 +26,8 @@ module Magma
         ap parser.tokens
         ap ast
         out_filename = File.basename(filename, File.extname(filename)) + '.o'
-        out_file = File.open(out_filename, "wb")
-        codegen = Codegen.new(ast, out_file)
-        out_file.close
+        codegen = Codegen.new(ast, out_filename)
+        codegen.generate
       end
     end
 

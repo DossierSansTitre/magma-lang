@@ -12,6 +12,9 @@ module Magma
       def children
         [@expr]
       end
+
+      def generate(builder)
+      end
     end
   end
 end

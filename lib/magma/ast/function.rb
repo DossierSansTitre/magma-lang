@@ -19,6 +19,27 @@ module Magma
       def dump(indent)
         super(indent, "#{@name} -> #{@type}")
       end
+
+      def generate(mod)
+        f = mod.functions.add(mangled_name, [], LLVM::Int)
+        if @block
+          b = f.basic_blocks.append
+          @block.generate(b)
+        end
+        f
+      end
+
+      def main?
+        @name == "main"
+      end
+
+      def mangled_name
+        if main?
+          "magma_main"
+        else
+          @name
+        end
+      end
     end
   end
 end

@@ -11,6 +11,14 @@ module Magma
       def dump(indent = 0)
         super(indent, "#{@value}:#{@type}")
       end
+
+      def generate
+        if @type == "Int"
+          LLVM::Int32.from_i(@value)
+        else
+          nil
+        end
+      end
     end
   end
 end

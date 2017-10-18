@@ -16,6 +16,12 @@ module Magma
       def children
         @statements
       end
+
+      def generate(block)
+        block.build do |builder|
+          @statements.each {|s| s.generate(builder)}
+        end
+      end
     end
   end
 end

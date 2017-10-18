@@ -1,4 +1,5 @@
 require 'magma/ast/block'
+require 'magma/support/name_mangler'
 
 module Magma
   module AST
@@ -20,25 +21,22 @@ module Magma
         super(indent, "#{@name} -> #{@type}")
       end
 
-      def generate(mod)
-        f = mod.functions.add(mangled_name, [], LLVM::Int)
-        if @block
+      def generate(mod, generate_body)
+        f = nil
+        if generate_body
+          f = mod.functions[mangled_name]
+        else
+          f = mod.functions.add(mangled_name, [], LLVM::Int)
+        end
+        if @block && generate_body
           b = f.basic_blocks.append
-          @block.generate(b)
+          @block.generate(mod, b)
         end
         f
       end
 
-      def main?
-        @name == "main"
-      end
-
       def mangled_name
-        if main?
-          "magma_main"
-        else
-          @name
-        end
+        Support::NameMangler.function(@name)
       end
     end
   end

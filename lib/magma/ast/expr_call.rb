@@ -1,4 +1,5 @@
 require 'magma/ast/node'
+require 'magma/support/name_mangler'
 
 module Magma
   module AST
@@ -18,6 +19,10 @@ module Magma
 
       def dump(indent = 0)
         super(indent, @func_name)
+      end
+
+      def generate(mod, builder)
+        builder.call(mod.functions[Support::NameMangler.function(@func_name)])
       end
     end
   end

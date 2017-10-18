@@ -12,7 +12,7 @@ module Magma
         super(indent, "#{@value}:#{@type}")
       end
 
-      def generate
+      def generate(mod, builder)
         if @type == "Int"
           LLVM::Int32.from_i(@value)
         else

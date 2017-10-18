@@ -16,10 +16,8 @@ module Magma
         @functions
       end
 
-      def generate
-        ::LLVM::Module.new("magma").tap do |mod|
-          @functions.each {|f| f.generate(mod)}
-        end
+      def generate(mod, generate_body)
+        @functions.each {|f| f.generate(mod, generate_body)}
       end
     end
   end

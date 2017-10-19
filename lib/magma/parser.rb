@@ -96,11 +96,21 @@ module Magma
         restore
         return
       end
-      unless accept(:tlparen) && accept(:trparen)
+      unless accept(:tlparen)
         restore
         return
       end
       function = AST::Function.new(id.str)
+      loop do
+        i = accept(:identifier)
+        break if i.nil?
+        function.add_param(i)
+        break unless accept(:tcomma)
+      end
+      unless accept(:trparen)
+        restore
+        return
+      end
       if accept(:tarrow)
         type = accept(:identifier)
         function.type = type.str
@@ -153,6 +163,7 @@ module Magma
       expr = nil
       expr ||= parse_expr_call
       expr ||= parse_expr_literal
+      expr ||= parse_expr_identifier
       expr
     end
 
@@ -191,6 +202,17 @@ module Magma
       end
       commit
       AST::ExprLiteral.new("Int", num.number)
+    end
+
+    def parse_expr_identifier
+      save
+      id = accept(:identifier)
+      if id.nil?
+        restore
+        return
+      end
+      commit
+      AST::ExprIdentifier.new(id.str)
     end
   end
 end

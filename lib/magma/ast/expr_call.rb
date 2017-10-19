@@ -22,7 +22,8 @@ module Magma
       end
 
       def generate(mod, builder)
-        builder.call(mod.functions[Support::NameMangler.function(@func_name)])
+        args = @arguments.map{ |a| a.generate(mod, builder) }
+        builder.call(mod.functions[Support::NameMangler.function(@func_name)], *args)
       end
     end
   end

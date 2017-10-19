@@ -1,7 +1,7 @@
-fun foo() -> Int {
-    return 7;
+fun foo(param_1, param_2) -> Int {
+    return param_1;
 }
 
 fun main() -> Int {
-  return foo();
+  return foo(foo(foo(12, 5), 0), 3);
 }

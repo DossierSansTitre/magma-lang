@@ -26,12 +26,12 @@ module Magma
         super(indent, "#{@name} -> #{@type}")
       end
 
-      def generate(mod, generate_body)
+      def generate(ast, generate_body)
         f = nil
         if generate_body
-          f = mod.functions[mangled_name]
+          f = ast.module.functions[mangled_name]
         else
-          f = mod.functions.add(mangled_name, [LLVM::Int] * @params.length, LLVM::Int)
+          f = ast.module.functions.add(mangled_name, [LLVM::Int] * @params.length, LLVM::Int)
           f.params.each_with_index do |p, i|
             name = @params[i].str
             p.name = name
@@ -46,7 +46,7 @@ module Magma
               $named_values[p.name] = alloc
             end
           end
-          @block.generate(mod, b)
+          @block.generate(ast, b)
         end
         f
       end

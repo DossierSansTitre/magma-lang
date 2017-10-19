@@ -17,9 +17,9 @@ module Magma
         @statements
       end
 
-      def generate(mod, block)
+      def generate(ast, block)
         block.build do |builder|
-          @statements.each {|s| s.generate(mod, builder)}
+          @statements.each {|s| s.generate(ast, builder)}
         end
       end
     end

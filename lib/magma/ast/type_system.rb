@@ -1,4 +1,4 @@
-require 'magma/lang/type_native'
+require 'magma/ast/type_native'
 
 module Magma
   class TypeSystem

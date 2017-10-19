@@ -8,5 +8,9 @@ module Magma
       @bits = bits
       @signed = signed
     end
+
+    def to_llvm
+      nil
+    end
   end
 end

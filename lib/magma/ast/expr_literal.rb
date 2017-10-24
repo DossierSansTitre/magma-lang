@@ -12,7 +12,7 @@ module Magma
         super(indent, "#{@value}:#{@type}")
       end
 
-      def generate(ast, builder)
+      def generate(ast, block, builder)
         t = ast.types[@type]
         t_llvm = t.to_llvm
         t_llvm.from_i(@value)

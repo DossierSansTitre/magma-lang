@@ -14,7 +14,7 @@ module Magma
         [@expr]
       end
 
-      def generate(builder)
+      def generate(ast, block, builder)
       end
     end
   end

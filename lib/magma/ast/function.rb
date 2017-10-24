@@ -38,19 +38,14 @@ module Magma
           func_types = @params.map{|p| p.type(ast).to_llvm}
           f = ast.module.functions.add(mangled_name, func_types, return_type(ast).to_llvm)
           f.params.each_with_index do |p, i|
-            name = @params[i].name
-            p.name = name
+            p.name = @params[i].name
           end
         end
         if @block && generate_body
-          b = f.basic_blocks.append
           f.params.each do |p|
-            b.build do |builder|
-              alloc = builder.alloca(p)
-              builder.store(p, alloc)
-              $named_values[p.name] = alloc
-            end
+            @block.set_variable(p.name, p)
           end
+          b = f.basic_blocks.append
           @block.generate(ast, b)
         end
         f

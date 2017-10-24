@@ -9,9 +9,8 @@ module Magma
         super(indent, @name)
       end
 
-      def generate(ast, builder)
-        value = $named_values[@name]
-        builder.load(value, @name)
+      def generate(ast, block, builder)
+        block.variable(@name)
       end
     end
   end

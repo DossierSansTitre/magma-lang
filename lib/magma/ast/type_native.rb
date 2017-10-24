@@ -10,7 +10,16 @@ module Magma
     end
 
     def to_llvm
-      nil
+      case @kind
+      when :void
+        LLVM::Void
+      when :int
+        LLVM.const_get("Int#{@bits}")
+      when :float
+        LLVM.const_get("Float#{@bits}")
+      when :bool
+        LLVM::Int1
+      end
     end
   end
 end

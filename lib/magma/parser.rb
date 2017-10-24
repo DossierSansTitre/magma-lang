@@ -104,7 +104,9 @@ module Magma
       loop do
         i = accept(:identifier)
         break if i.nil?
-        function.add_param(i)
+        accept(:tcolon)
+        t = accept(:identifier)
+        function.add_param(AST::FunctionParam.new(i.str, t.str))
         break unless accept(:tcomma)
       end
       unless accept(:trparen)

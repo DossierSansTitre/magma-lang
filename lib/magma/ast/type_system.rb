@@ -7,6 +7,10 @@ module Magma
       add_builtin_types
     end
 
+    def [](type)
+      @types[type]
+    end
+
     def add(type)
       @types[type.name] = type
     end
@@ -24,6 +28,10 @@ module Magma
 
     private
     def add_builtin_types
+      add_native("Void", :void, 0)
+
+      add_native("Bool", :bool, 1)
+
       add_native("Int8",  :int, 8,  true)
       add_native("Int16", :int, 16, true)
       add_native("Int32", :int, 32, true)
@@ -43,6 +51,7 @@ module Magma
       alias_type("Float", "Float32")
       alias_type("Double", "Float64")
       alias_type("Byte", "UInt8")
+      alias_type("Bit", "Bool")
     end
   end
 end

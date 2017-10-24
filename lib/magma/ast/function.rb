@@ -14,12 +14,16 @@ module Magma
         @params = []
       end
 
+      def return_type(ast)
+        ast.types[@type]
+      end
+
       def add_param(param)
         @params << param
       end
 
       def children
-        [@block].reject(&:nil?)
+        (@params + [@block]).reject(&:nil?)
       end
 
       def dump(indent)
@@ -31,9 +35,10 @@ module Magma
         if generate_body
           f = ast.module.functions[mangled_name]
         else
-          f = ast.module.functions.add(mangled_name, [LLVM::Int] * @params.length, LLVM::Int)
+          func_types = @params.map{|p| p.type(ast).to_llvm}
+          f = ast.module.functions.add(mangled_name, func_types, return_type(ast).to_llvm)
           f.params.each_with_index do |p, i|
-            name = @params[i].str
+            name = @params[i].name
             p.name = name
           end
         end

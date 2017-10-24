@@ -1,4 +1,4 @@
-fun foo(param_1, param_2) -> Int {
+fun foo(param_1: Int, param_2: Int) -> Int {
     return param_1;
 }
 

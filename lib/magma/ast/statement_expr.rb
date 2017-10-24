@@ -1,6 +1,7 @@
 require 'magma/ast/node'
 require 'magma/ast/expr_call'
 require 'magma/ast/expr_literal'
+require 'magma/ast/expr_identifier'
 
 module Magma
   module AST
@@ -13,7 +14,7 @@ module Magma
         [@expr]
       end
 
-      def generate(builder)
+      def generate(ast, block, builder)
       end
     end
   end

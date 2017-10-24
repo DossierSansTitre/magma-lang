@@ -12,12 +12,10 @@ module Magma
         super(indent, "#{@value}:#{@type}")
       end
 
-      def generate(mod, builder)
-        if @type == "Int"
-          LLVM::Int32.from_i(@value)
-        else
-          nil
-        end
+      def generate(ast, block, builder)
+        t = ast.types[@type]
+        t_llvm = t.to_llvm
+        t_llvm.from_i(@value)
       end
     end
   end

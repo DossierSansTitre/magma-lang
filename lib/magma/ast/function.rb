@@ -11,26 +11,42 @@ module Magma
         @name = name
         @block = nil
         @type = "Void"
+        @params = []
+      end
+
+      def return_type(ast)
+        ast.types[@type]
+      end
+
+      def add_param(param)
+        @params << param
       end
 
       def children
-        [@block].reject(&:nil?)
+        (@params + [@block]).reject(&:nil?)
       end
 
       def dump(indent)
         super(indent, "#{@name} -> #{@type}")
       end
 
-      def generate(mod, generate_body)
+      def generate(ast, generate_body)
         f = nil
         if generate_body
-          f = mod.functions[mangled_name]
+          f = ast.module.functions[mangled_name]
         else
-          f = mod.functions.add(mangled_name, [], LLVM::Int)
+          func_types = @params.map{|p| p.type(ast).to_llvm}
+          f = ast.module.functions.add(mangled_name, func_types, return_type(ast).to_llvm)
+          f.params.each_with_index do |p, i|
+            p.name = @params[i].name
+          end
         end
         if @block && generate_body
+          f.params.each do |p|
+            @block.set_variable(p.name, p)
+          end
           b = f.basic_blocks.append
-          @block.generate(mod, b)
+          @block.generate(ast, b)
         end
         f
       end

@@ -8,9 +8,7 @@ module Magma
     end
 
     def generate
-      mod = ::LLVM::Module.new("magma")
-      @ast.generate(mod, false)
-      @ast.generate(mod, true)
+      mod = @ast.generate
       mod.dump
       LLVM::Target.init_native(true)
       target = LLVM::Target.each.first

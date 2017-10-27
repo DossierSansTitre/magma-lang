@@ -8,7 +8,12 @@ module Magma
 
     KEYWORDS = {
       'fun'     => :kfun,
-      'return'  => :kreturn
+      'return'  => :kreturn,
+      'var'     => :kvar,
+      'if'      => :kif,
+      'else'    => :kelse,
+      'while'   => :kwhile,
+      'for'     => :kfor
     }
 
     SYMBOLS = {
@@ -19,7 +24,8 @@ module Magma
       '->'  => :tarrow,
       ','   => :tcomma,
       ';'   => :tsemicolon,
-      ':'   => :tcolon
+      ':'   => :tcolon,
+      '='   => :tassign
     }
 
     def initialize(filename, stream, reporter)

@@ -1,6 +1,5 @@
 require 'magma/ast/node'
-require 'magma/ast/statement_expr'
-require 'magma/ast/statement_return'
+require 'magma/ast/variable'
 
 module Magma
   module AST
@@ -18,8 +17,9 @@ module Magma
         @statements
       end
 
-      def set_variable(name, value)
-        @vars[name] = value
+      def set_variable(name, type, value)
+        v = Variable.new(name, type, value)
+        @vars[name] = v
       end
 
       def variable(name)

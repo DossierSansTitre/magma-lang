@@ -1,7 +1,15 @@
-require 'magma/ast/root'
+require 'magma/ast/block'
+require 'magma/ast/expr'
+require 'magma/ast/expr_assign'
+require 'magma/ast/expr_call'
+require 'magma/ast/expr_identifier'
+require 'magma/ast/expr_literal'
+require 'magma/ast/function'
 require 'magma/ast/function_param'
-
-module Magma
-  module AST
-  end
-end
+require 'magma/ast/node'
+require 'magma/ast/root'
+require 'magma/ast/statement_expr'
+require 'magma/ast/statement_return'
+require 'magma/ast/statement_variable'
+require 'magma/ast/type_native'
+require 'magma/ast/type_system'

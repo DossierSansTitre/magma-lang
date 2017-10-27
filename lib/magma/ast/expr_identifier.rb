@@ -10,7 +10,7 @@ module Magma
       end
 
       def generate(ast, block, builder)
-        block.variable(@name)
+        builder.load(block.variable(@name).value)
       end
     end
   end

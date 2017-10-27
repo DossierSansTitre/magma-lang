@@ -1,4 +1,4 @@
-require 'magma/ast/node'
+require 'magma/ast/expr'
 
 module Magma
   module AST
@@ -6,6 +6,10 @@ module Magma
       def initialize(type, value)
         @type = type
         @value = value
+      end
+
+      def type(ast)
+        ast.type(@type)
       end
 
       def dump(indent = 0)

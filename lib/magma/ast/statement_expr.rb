@@ -3,6 +3,7 @@ require 'magma/ast/expr_call'
 require 'magma/ast/expr_literal'
 require 'magma/ast/expr_identifier'
 require 'magma/ast/binary_expr'
+require 'magma/ast/unary_expr'
 
 module Magma
   module AST

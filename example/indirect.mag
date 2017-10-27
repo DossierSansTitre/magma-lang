@@ -2,6 +2,14 @@ fun foo(param_1: Int, param_2: Int) -> Int {
     return param_1;
 }
 
+fun xor(n: Bool) -> Bool {
+    return !n;
+}
+
+fun invert(n: Int) -> Int {
+    return -n;
+}
+
 fun main() -> Int {
-  return foo() + foo() / foo();
+  return invert(---18);
 }

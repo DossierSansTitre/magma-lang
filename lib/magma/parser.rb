@@ -188,11 +188,12 @@ module Magma
       factor ||= parse_expr_literal
       factor ||= parse_expr_call
       factor ||= parse_expr_identifier
+      factor ||= parse_boolean_identifier
       factor
     end
 
     def parse_term
-      term = parse_factor
+      term = parse_unary
       loop do
         a = nil
         a ||= accept(:tmul)
@@ -213,6 +214,7 @@ module Magma
       expr
     end
 
+<<<<<<< HEAD
     def parse_expr_assign
       save
       name = accept(:identifier)
@@ -231,6 +233,17 @@ module Magma
       end
       commit
       AST::ExprAssign.new(name.str, expr)
+    end
+
+    def parse_unary
+      a = nil
+      a ||= accept(:tminus)
+      a ||= accept(:tbang)
+      if a
+        AST::UnaryExpr.new(a.type, parse_unary)
+      else
+        parse_factor
+      end
     end
 
     def parse_expr_call
@@ -298,6 +311,20 @@ module Magma
       end
       commit
       AST::ExprIdentifier.new(id.str)
+    end
+
+    def parse_boolean_identifier
+      save
+      bool = nil
+      bool ||= accept(:ktrue)
+      bool ||= accept(:kfalse)
+      unless bool
+        restore
+        return
+      end
+      commit
+      p bool
+      AST::ExprLiteral.new("Bool", bool.type == :ktrue ? 1 : 0)
     end
   end
 end

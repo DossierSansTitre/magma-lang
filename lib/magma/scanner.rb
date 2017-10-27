@@ -33,7 +33,16 @@ module Magma
       '*'   => :tmul,
       '/'   => :tdiv,
       '%'   => :tmod,
+      '=='  => :teq,
+      '='   => :tasg,
+      '!='  => :tne,
       '!'   => :tbang,
+      '>='  => :tge,
+      '>'   => :tg,
+      '<='  => :tle,
+      '<'   => :tl,
+      '||'  => :tor,
+      '&&'  => :tand,
     }
 
     def initialize(filename, stream, reporter)

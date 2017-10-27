@@ -11,5 +11,5 @@ fun invert(n: Int) -> Int {
 }
 
 fun main() -> Int {
-  return invert(---18);
+  return true || false;
 }

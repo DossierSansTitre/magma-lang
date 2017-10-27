@@ -156,7 +156,7 @@ module Magma
     end
 
     def parse_statement_expr
-      e = parse_expr
+      e = parse_or
       return if e.nil?
       save
       unless accept(:tsemicolon)
@@ -173,13 +173,55 @@ module Magma
         restore
         return
       end
-      e = parse_expr
+      e = parse_or
       unless accept(:tsemicolon)
         restore
         return
       end
       commit
       AST::StatementReturn.new(e)
+    end
+
+    def parse_or
+      expr = parse_and
+      while (a = accept(:tor))
+        expr = AST::BinaryExpr.new(:tor, expr, parse_and)
+      end
+      expr
+    end
+
+    def parse_and
+      expr = parse_equality
+      while (a = accept(:tand))
+        expr = AST::BinaryExpr.new(:tand, expr, parse_equality)
+      end
+      expr
+    end
+
+    def parse_equality
+      expr = parse_relation
+      loop do
+        a = nil
+        a ||= accept(:teq)
+        a ||= accept(:tne)
+        break unless a
+        expr = AST::BinaryExpr.new(a.type, expr, parse_relation)
+      end
+      expr
+    end
+
+    def parse_relation
+      expr = parse_expr
+      loop do
+        a = nil
+        a ||= accept(:tg)
+        a ||= accept(:tge)
+        a ||= accept(:tl)
+        a ||= accept(:tle)
+        break unless a
+        expr = AST::BinaryExpr.new(a.type, expr, parse_expr)
+      end
+      expr
     end
 
     def parse_factor
@@ -259,7 +301,7 @@ module Magma
       end
       call = AST::ExprCall.new(id.str)
       loop do
-        e = parse_expr
+        e = parse_or
         break if e.nil?
         call.add_argument(e)
         break unless accept(:tcomma)
@@ -278,7 +320,7 @@ module Magma
         restore
         return
       end
-      e = parse_expr
+      e = parse_or
       if e.nil?
         restore
         return

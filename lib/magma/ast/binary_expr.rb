@@ -11,9 +11,9 @@ module Magma
         @rhs = rhs
       end
 
-      def generate(mod, builder)
-        lhs = @lhs.generate(mod, builder)
-        rhs = @rhs.generate(mod, builder)
+      def generate(ast, block, builder)
+        lhs = @lhs.generate(ast, block, builder)
+        rhs = @rhs.generate(ast, block, builder)
 
         case @op
         when :tplus

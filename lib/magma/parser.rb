@@ -182,6 +182,28 @@ module Magma
       AST::StatementReturn.new(e)
     end
 
+    def parse_factor
+      factor = nil
+      factor ||= parse_expr_paren
+      factor ||= parse_expr_literal
+      factor ||= parse_expr_call
+      factor ||= parse_expr_identifier
+      factor
+    end
+
+    def parse_term
+      term = parse_factor
+      loop do
+        a = nil
+        a ||= accept(:tmul)
+        a ||= accept(:tdiv)
+        a ||= accept(:tmod)
+        break unless a
+        term = AST::BinaryExpr.new(a.type, term, parse_term)
+      end
+      term
+    end
+
     def parse_expr
       expr = nil
       expr ||= parse_expr_assign
@@ -235,6 +257,25 @@ module Magma
       end
       commit
       call
+    end
+
+    def parse_expr_paren
+      save
+      unless accept(:tlparen)
+        restore
+        return
+      end
+      e = parse_expr
+      if e.nil?
+        restore
+        return
+      end
+      unless accept(:trparen)
+        restore
+        return
+      end
+      commit
+      e
     end
 
     def parse_expr_literal

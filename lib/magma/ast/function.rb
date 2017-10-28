@@ -42,10 +42,17 @@ module Magma
           end
         end
         if @block && generate_body
-          f.params.each do |p|
-            @block.set_variable(p.name, p)
-          end
           b = f.basic_blocks.append
+          b.build do |builder|
+            @params.each do |param|
+              type = param.type(ast)
+              name = param.name
+              llvm_param = f.params.find {|x| x.name == name}
+              loc = builder.alloca(type.to_llvm, "param_#{name}")
+              builder.store(llvm_param, loc)
+              @block.set_variable(name, type, loc)
+            end
+          end
           @block.generate(ast, b)
         end
         f

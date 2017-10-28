@@ -1,9 +1,9 @@
-require 'magma/ast/node'
+require 'magma/ast/expr'
 require 'magma/support/name_mangler'
 
 module Magma
   module AST
-    class ExprCall < Node
+    class ExprCall < Expr
       def initialize(func_name)
         @func_name = func_name
         @arguments = []

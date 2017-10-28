@@ -129,9 +129,30 @@ module Magma
 
     def parse_statement
       statement = nil
+      statement ||= parse_statement_variable
       statement ||= parse_statement_return
       statement ||= parse_statement_expr
       statement
+    end
+
+    def parse_statement_variable
+      save
+      unless accept(:kvar)
+        restore
+        return
+      end
+      name = accept(:identifier)
+      unless accept(:tcolon)
+        restore
+        return
+      end
+      type = accept(:identifier)
+      unless accept(:tsemicolon)
+        restore
+        return
+      end
+      commit
+      return AST::StatementVariable.new(name.str, type.str)
     end
 
     def parse_statement_expr
@@ -163,10 +184,31 @@ module Magma
 
     def parse_expr
       expr = nil
+      expr ||= parse_expr_assign
       expr ||= parse_expr_call
       expr ||= parse_expr_literal
       expr ||= parse_expr_identifier
       expr
+    end
+
+    def parse_expr_assign
+      save
+      name = accept(:identifier)
+      if name.nil?
+        restore
+        return
+      end
+      unless accept(:tassign)
+        restore
+        return
+      end
+      expr = parse_expr
+      if expr.nil?
+        restore
+        return
+      end
+      commit
+      AST::ExprAssign.new(name.str, expr)
     end
 
     def parse_expr_call

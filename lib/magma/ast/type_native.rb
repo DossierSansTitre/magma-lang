@@ -9,6 +9,19 @@ module Magma
       @signed = signed
     end
 
+    def value(v)
+      case @kind
+      when :void
+        nil
+      when :int
+        to_llvm.from_i(v)
+      when :float
+        to_llvm.from_f(v)
+      when :bool
+        to_llvm.from_i(v ? 1 : 0)
+      end
+    end
+
     def to_llvm
       case @kind
       when :void

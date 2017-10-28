@@ -1,0 +1,6 @@
+fun main() -> Int {
+    var r : Int;
+
+    r = 5;
+    return r;
+}

@@ -26,9 +26,11 @@ module Magma
         @vars[name]
       end
 
-      def generate(ast, block)
-        block.build do |builder|
-          @statements.each {|s| s.generate(ast, self, builder)}
+      def generate(ctx)
+        ctx.block = self
+        ctx.llvm_block.build do |builder|
+          ctx.builder = builder
+          @statements.each {|s| s.generate(ctx)}
         end
       end
     end

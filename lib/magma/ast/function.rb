@@ -14,8 +14,8 @@ module Magma
         @params = []
       end
 
-      def return_type(ast)
-        ast.types[@type]
+      def type(ctx)
+        ctx.ast.types[@type]
       end
 
       def add_param(param)
@@ -30,13 +30,14 @@ module Magma
         super(indent, "#{@name} -> #{@type}")
       end
 
-      def generate(ast, generate_body)
+      def generate(ctx, generate_body)
+        ctx.function = self
         f = nil
         if generate_body
-          f = ast.module.functions[mangled_name]
+          f = ctx.module.functions[mangled_name]
         else
-          func_types = @params.map{|p| p.type(ast).to_llvm}
-          f = ast.module.functions.add(mangled_name, func_types, return_type(ast).to_llvm)
+          func_types = @params.map{|p| p.type(ctx).to_llvm}
+          f = ctx.module.functions.add(mangled_name, func_types, type(ctx).to_llvm)
           f.params.each_with_index do |p, i|
             p.name = @params[i].name
           end
@@ -45,7 +46,7 @@ module Magma
           b = f.basic_blocks.append
           b.build do |builder|
             @params.each do |param|
-              type = param.type(ast)
+              type = param.type(ctx)
               name = param.name
               llvm_param = f.params.find {|x| x.name == name}
               loc = builder.alloca(type.to_llvm, "param_#{name}")
@@ -53,7 +54,8 @@ module Magma
               @block.set_variable(name, type, loc)
             end
           end
-          @block.generate(ast, b)
+          ctx.llvm_block = b
+          @block.generate(ctx)
         end
         f
       end

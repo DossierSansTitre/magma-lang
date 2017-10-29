@@ -11,7 +11,6 @@ module Magma
       def initialize
         @functions = []
         @types = TypeSystem.new
-        @module = nil
       end
 
       def add_function(fun)
@@ -22,11 +21,12 @@ module Magma
         @functions
       end
 
-      def generate
-        @module = LLVM::Module.new("Magma")
-        @functions.each {|f| f.generate(self, false)}
-        @functions.each {|f| f.generate(self, true)}
-        @module
+      def generate(ctx)
+        ctx.ast = self
+        ctx.module = LLVM::Module.new("Magma")
+        @functions.each {|f| f.generate(ctx, false)}
+        @functions.each {|f| f.generate(ctx, true)}
+        nil
       end
     end
   end

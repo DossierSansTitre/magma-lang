@@ -1,6 +1,9 @@
 module Magma
   class TypeNative
     attr_reader :name
+    attr_reader :kind
+    attr_reader :bits
+    attr_reader :signed
 
     def initialize(name, kind, bits, signed)
       @name = name

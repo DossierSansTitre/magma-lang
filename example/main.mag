@@ -1,3 +1,7 @@
+fun check_five(a: Int) -> Bool {
+    return a > 5;
+}
+
 fun main() -> Int {
-    return 1 + 2 * 3 + 4;
+    return check_five(3);
 }

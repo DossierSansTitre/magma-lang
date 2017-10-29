@@ -11,11 +11,11 @@ module Magma
         [@expr].reject(&:nil?)
       end
 
-      def generate(ast, block, builder)
+      def generate(ctx)
         if @expr.nil?
-          builder.ret_void
+          ctx.builder.ret_void
         else
-          builder.ret(@expr.generate(ast, block, builder))
+          ctx.builder.ret(@expr.generate(ctx))
         end
       end
     end

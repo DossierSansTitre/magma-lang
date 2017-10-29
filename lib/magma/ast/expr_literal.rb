@@ -8,16 +8,16 @@ module Magma
         @value = value
       end
 
-      def type(ast)
-        ast.type(@type)
+      def type(ctx)
+        ctx.ast.types[@type]
       end
 
       def dump(indent = 0)
         super(indent, "#{@value}:#{@type}")
       end
 
-      def generate(ast, block, builder)
-        t = ast.types[@type]
+      def generate(ctx)
+        t = ctx.ast.types[@type]
         t_llvm = t.to_llvm
         t_llvm.from_i(@value)
       end

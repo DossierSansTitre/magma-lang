@@ -16,10 +16,10 @@ module Magma
         super(indent, @name)
       end
 
-      def generate(ast, block, builder)
-        value = @expr.generate(ast, block, builder)
-        loc = block.variable(@name).value
-        builder.store(value, loc)
+      def generate(ctx)
+        value = @expr.generate(ctx)
+        loc = ctx.block.variable(@name).value
+        ctx.builder.store(value, loc)
         value
       end
     end

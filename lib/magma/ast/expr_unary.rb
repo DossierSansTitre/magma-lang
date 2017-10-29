@@ -16,6 +16,10 @@ module Magma
         super(indent, @op)
       end
 
+      def type(ctx)
+        @expr.type(ctx)
+      end
+
       def generate(ctx)
         expr = @expr.generate(ctx)
 

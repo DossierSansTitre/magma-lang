@@ -357,6 +357,13 @@ module Magma
     end
 
     def parse_expr_literal
+      e = nil
+      e ||= parse_expr_literal_num
+      e ||= parse_expr_literal_bool
+      e
+    end
+
+    def parse_expr_literal_num
       save
       num = accept(:number)
       if num.nil?
@@ -365,6 +372,14 @@ module Magma
       end
       commit
       AST::ExprLiteral.new("Int", num.number)
+    end
+
+    def parse_expr_literal_bool
+      if accept(:ktrue)
+        AST::ExprLiteral.new("Bool", true)
+      elsif accept(:kfalse)
+        AST::ExprLiteral.new("Bool", false)
+      end
     end
 
     def parse_expr_identifier

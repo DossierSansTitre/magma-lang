@@ -8,18 +8,25 @@ module Magma
         @value = value
       end
 
-      def type(ast)
-        ast.type(@type)
+      def type(ctx)
+        ctx.ast.types[@type]
       end
 
       def dump(indent = 0)
         super(indent, "#{@value}:#{@type}")
       end
 
-      def generate(ast, block, builder)
-        t = ast.types[@type]
+      def generate(ctx)
+        t = type(ctx)
         t_llvm = t.to_llvm
-        t_llvm.from_i(@value)
+        case t.kind
+        when :int
+          t_llvm.from_i(@value)
+        when :float
+          t_llvm.from_f(@value)
+        when :bool
+          t_llvm.from_i(@value ? 1 : 0)
+        end
       end
     end
   end

@@ -371,7 +371,16 @@ module Magma
         return
       end
       commit
-      AST::ExprLiteral.new("Int", num.number)
+      case num.number_type
+      when :int
+        AST::ExprLiteral.new("Int", num.number)
+      when :unsigned_int
+        AST::ExprLiteral.new("UInt", num.number)
+      when :float32
+        AST::ExprLiteral.new("Float32", num.number)
+      when :float64
+        AST::ExprLiteral.new("Float64", num.number)
+      end
     end
 
     def parse_expr_literal_bool

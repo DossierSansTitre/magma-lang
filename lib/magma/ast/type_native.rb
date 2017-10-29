@@ -1,6 +1,12 @@
+require 'llvm/linker'
+require 'llvm/target'
+
 module Magma
   class TypeNative
     attr_reader :name
+    attr_reader :kind
+    attr_reader :bits
+    attr_reader :signed
 
     def initialize(name, kind, bits, signed)
       @name = name
@@ -25,11 +31,18 @@ module Magma
     def to_llvm
       case @kind
       when :void
-        LLVM::Void
+        LLVM.Void
       when :int
         LLVM.const_get("Int#{@bits}")
       when :float
-        LLVM.const_get("Float#{@bits}")
+        case @bits
+        when 64
+          LLVM::Double
+        when 32
+          LLVM::Float
+        else
+          nil
+        end
       when :bool
         LLVM::Int1
       end

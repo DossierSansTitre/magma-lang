@@ -3,8 +3,7 @@ require 'magma/token'
 
 module Magma
   class Scanner
-    IDENTIFIER  = /\A[a-zA-Z_][a-zA-Z0-9_]*\z/
-    NUMBER      = /\A(\+|-)?[0-9]+\z/
+    IDENTIFIER      = /\A[a-zA-Z_][a-zA-Z0-9_]*\z/
 
     KEYWORDS = {
       'fun'     => :kfun,
@@ -119,6 +118,9 @@ module Magma
       end
       loop do
         c = stream_getc
+        if c.nil?
+          break
+        end
         tmp = id + c
         unless regex =~ tmp
           stream_putc c
@@ -129,12 +131,25 @@ module Magma
       id
     end
 
-    def identifier
-      scan_regex(IDENTIFIER)
+    def scan_regex_prefix(prefix, regex)
+      pre = stream_gets(prefix.size)
+      if pre.nil?
+        return
+      end
+      if pre != prefix
+        stream_puts(pre)
+        return
+      end
+      body = scan_regex(regex)
+      if body.nil?
+        stream_puts(pre)
+        return
+      end
+      pre + body
     end
 
-    def number
-      scan_regex(NUMBER)
+    def identifier
+      scan_regex(IDENTIFIER)
     end
 
     def keyword
@@ -177,10 +192,83 @@ module Magma
     end
 
     def scan_number
+      scan_number_float || scan_number_int
+    end
+
+    def scan_number_float
       loc = source_loc
-      num = number
-      return if num.nil?
-      TokenNumber.new(:number, num, loc)
+      int_part = scan_regex(/\A[0-9]+\z/)
+      return if int_part.nil?
+      dot = stream_getc
+      if dot != '.'
+        stream_putc dot unless dot.nil?
+        stream_puts int_part
+        return
+      end
+      frac_part = scan_regex(/\A(([0-9]*f)|([0-9]+))\z/)
+      if frac_part.nil?
+        stream_putc dot
+        stream_puts int_part
+        return
+      end
+      str = int_part + '.' + frac_part
+      t = :float64
+      if str[-1] == 'f'
+        str = str[0..-2]
+        t = :float32
+      end
+      TokenNumber.new(str.to_f, t, loc)
+    end
+
+    def scan_number_int
+      n = nil
+      n ||= scan_number_int_bin
+      n ||= scan_number_int_oct
+      n ||= scan_number_int_hex
+      n ||= scan_number_int_dec
+      n
+    end
+
+    def scan_number_int_bin
+      loc = source_loc
+      str = scan_regex_prefix("0b", /\A[0-1]+\z/)
+      return if str.nil?
+      str = str[2..-1]
+      TokenNumber.new(str.to_i(2), :unsigned_int, loc)
+    end
+
+    def scan_number_int_oct
+      loc = source_loc
+      str = scan_regex_prefix("0o", /\A[0-7]+\z/)
+      str ||= scan_regex_prefix("0", /\A[0-7]+\z/)
+      return if str.nil?
+      p str
+      if str[1] == 'o'
+        str = str[2..-1]
+      else
+        str = str[1..-1]
+      end
+      TokenNumber.new(str.to_i(8), :unsigned_int, loc)
+    end
+
+    def scan_number_int_hex
+      loc = source_loc
+      str = scan_regex_prefix("0x", /\A[0-9a-fA-F]+\z/)
+      return if str.nil?
+      str = str[2..-1]
+      TokenNumber.new(str.to_i(16), :unsigned_int, loc)
+    end
+
+    def scan_number_int_dec
+      loc = source_loc
+      str = scan_regex(/\A[0-9]+u?\z/)
+      return if str.nil?
+      t = :int
+      if str[-1] == 'u'
+        str = str[0..-2]
+        t = :unsigned_int
+      end
+      TokenNumber.new(str.to_i(10), t, loc)
     end
 
     def scan_symbol

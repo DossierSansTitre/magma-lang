@@ -1,3 +1,7 @@
+fun test(a: UInt8, b: UInt8) -> UInt16 {
+    return a * a * b;
+}
+
 fun main() -> Int {
-    return 1 + 2 * 3 + 4;
+    return test(3, 2);
 }

@@ -27,15 +27,17 @@ module Magma
         reporter.report
         return
       end
-      ap parser.tokens
+      #ap parser.tokens
       ap ast
+      puts
+      puts
       obj_filename = nil
       if @driver.opts[:object]
         obj_filename = @driver.output
       else
         obj_filename = Dir::Tmpname.create(['magma-', '.o']) { }
       end
-      codegen = Codegen.new(ast, obj_filename)
+      codegen = Codegen.new(ast, obj_filename, @driver.optimize)
       codegen.generate
       unless @driver.opts[:object]
         cc = CompilerDriver.new

@@ -14,8 +14,8 @@ module Magma
         super(indent, "#{@name}: #{@type_str}")
       end
 
-      def type(ast)
-        ast.types[@type_str]
+      def type(ctx)
+        ctx.ast.types[@type_str]
       end
     end
   end

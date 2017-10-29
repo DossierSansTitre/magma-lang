@@ -21,9 +21,22 @@ module Magma
         super(indent, @func_name)
       end
 
-      def generate(ast, block, builder)
-        args = @arguments.map{ |a| a.generate(ast, block, builder) }
-        builder.call(ast.module.functions[Support::NameMangler.function(@func_name)], *args)
+      def type(ctx)
+        ctx.ast.function(@func_name).type(ctx)
+      end
+
+      def generate(ctx)
+        args = []
+        f = ctx.ast.function(@func_name)
+        @arguments.each_with_index do |expr, i|
+          expr_type = expr.type(ctx)
+          expr_value = expr.generate(ctx)
+          a = f.params[i]
+          arg_type = a.type(ctx)
+          value = Support::TypeHelper.cast(ctx.builder, expr_type, arg_type, expr_value)
+          args << value
+        end
+        ctx.builder.call(ctx.module.functions[Support::NameMangler.function(@func_name)], *args)
       end
     end
   end

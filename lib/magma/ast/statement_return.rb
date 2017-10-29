@@ -11,11 +11,15 @@ module Magma
         [@expr].reject(&:nil?)
       end
 
-      def generate(ast, block, builder)
+      def generate(ctx)
+        ret_type = ctx.function.type(ctx)
         if @expr.nil?
-          builder.ret_void
+          ctx.builder.ret_void
         else
-          builder.ret(@expr.generate(ast, block, builder))
+          in_type = @expr.type(ctx)
+          value = @expr.generate(ctx)
+          value = Support::TypeHelper.cast(ctx.builder, in_type, ret_type, value)
+          ctx.builder.ret(value)
         end
       end
     end

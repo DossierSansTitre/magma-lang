@@ -1,10 +1,12 @@
 module Magma
   class TokenNumber < Token
     attr_reader :number
+    attr_reader :number_type
 
-    def initialize(type, str, source_loc)
-      super(type, source_loc)
-      @number = str.to_i
+    def initialize(number, number_type, source_loc)
+      super(:number, source_loc)
+      @number = number
+      @number_type = number_type
     end
 
     def inspect

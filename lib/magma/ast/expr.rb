@@ -3,8 +3,8 @@ require 'magma/ast/node'
 module Magma
   module AST
     class Expr < Node
-      def type(ast)
-        nil
+      def type(ctx)
+        throw :not_implemented
       end
     end
   end

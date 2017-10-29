@@ -16,16 +16,20 @@ module Magma
         super(indent, @op)
       end
 
-      def generate(ast, block, builder)
-        expr = @expr.generate(ast, block, builder)
+      def type(ctx)
+        @expr.type(ctx)
+      end
+
+      def generate(ctx)
+        expr = @expr.generate(ctx)
 
         case @op
         when :plus
           expr
         when :minus
-          builder.neg(expr)
+          ctx.builder.neg(expr)
         when :lnot, :not
-          builder.not(expr)
+          ctx.builder.not(expr)
         end
       end
     end

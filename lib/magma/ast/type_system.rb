@@ -2,13 +2,23 @@ require 'magma/ast/type_native'
 
 module Magma
   class TypeSystem
+    KIND_ORDER = {
+      :float => 0,
+      :int => 1,
+      :bool => 2
+    }
+
     def initialize
       @types = {}
       add_builtin_types
     end
 
-    def [](type)
+    def get(type)
       @types[type]
+    end
+
+    def [](type)
+      get(type)
     end
 
     def add(type)
@@ -24,6 +34,49 @@ module Magma
 
     def add_native(name, kind, bits, signed = true)
       add TypeNative.new(name, kind, bits, signed)
+    end
+
+    def result_type(a, b)
+      if a == b
+        if a.kind == :int && a.bits < 64
+          return find_minimal(:int, 64, a.signed)
+        end
+        return a
+      end
+
+      a, b = *([a, b].sort_by{|x| [KIND_ORDER[x.kind], x.bits]})
+
+      if a.kind != b.kind
+        if a.kind == :float
+          return find_minimal(:float, a.bits)
+        end
+        if a.kind == :int
+          return find_minimal(:int, 64, a.signed)
+        end
+      end
+
+      # Now we must convert between types of the same kind but different bitsizes and signedness
+      # For floats, it's easy, just take the largest
+      if a.kind == :float
+        return b
+      end
+
+      # For ints, it depends.
+      # If both are of the same signedness, use that.
+      # Else defaults to signed
+      if a.signed == b.signed
+        find_minimal(:int, 64, a.signed)
+      else
+        find_minimal(:int, 64, true)
+      end
+    end
+
+    def find_minimal(kind, bits, signed = nil)
+      @types.values.select { |x|
+        x.kind == kind && x.bits >= bits && (signed ? x.signed == signed : true)
+      }.sort { |x|
+        x.bits
+      }.first
     end
 
     private

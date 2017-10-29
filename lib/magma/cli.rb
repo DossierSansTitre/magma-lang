@@ -37,7 +37,7 @@ module Magma
       else
         obj_filename = Dir::Tmpname.create(['magma-', '.o']) { }
       end
-      codegen = Codegen.new(ast, obj_filename)
+      codegen = Codegen.new(ast, obj_filename, @driver.optimize)
       codegen.generate
       unless @driver.opts[:object]
         cc = CompilerDriver.new

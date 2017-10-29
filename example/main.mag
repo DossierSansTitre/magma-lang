@@ -1,7 +1,7 @@
-fun main() -> Int {
-    var a: UInt8;
+fun test(a: UInt8, b: UInt8) -> UInt16 {
+    return a * a * b;
+}
 
-    a = 7;
-    a = a + 16;
-    return a;
+fun main() -> Int {
+    return test(3, 2);
 }

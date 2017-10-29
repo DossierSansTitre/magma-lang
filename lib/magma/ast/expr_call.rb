@@ -26,7 +26,16 @@ module Magma
       end
 
       def generate(ctx)
-        args = @arguments.map{ |a| a.generate(ctx) }
+        args = []
+        f = ctx.ast.function(@func_name)
+        @arguments.each_with_index do |expr, i|
+          expr_type = expr.type(ctx)
+          expr_value = expr.generate(ctx)
+          a = f.params[i]
+          arg_type = a.type(ctx)
+          value = Support::TypeHelper.cast(ctx.builder, expr_type, arg_type, expr_value)
+          args << value
+        end
         ctx.builder.call(ctx.module.functions[Support::NameMangler.function(@func_name)], *args)
       end
     end

@@ -7,6 +7,7 @@ module Magma
       attr_writer :type
       attr_writer :block
       attr_reader :name
+      attr_reader :params
 
       def initialize(name)
         @name = name

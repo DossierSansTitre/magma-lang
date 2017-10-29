@@ -38,6 +38,9 @@ module Magma
 
     def result_type(a, b)
       if a == b
+        if a.kind == :int && a.bits < 64
+          return find_minimal(:int, 64, a.signed)
+        end
         return a
       end
 

@@ -9,7 +9,6 @@ module Magma
         @name = name
         @type = type
         @value = value
-        ap self
       end
     end
   end

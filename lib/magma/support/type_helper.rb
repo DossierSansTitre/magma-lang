@@ -2,8 +2,6 @@ module Magma
   module Support
     module TypeHelper
       def self.cast(builder, src_type, dst_type, value)
-        p src_type
-        p dst_type
         if src_type == dst_type
           value
         else

@@ -17,9 +17,16 @@ module Magma
       end
 
       def generate(ctx)
-        t = ctx.ast.types[@type]
+        t = type(ctx)
         t_llvm = t.to_llvm
-        t_llvm.from_i(@value)
+        case t.kind
+        when :int
+          t_llvm.from_i(@value)
+        when :float
+          t_llvm.from_f(@value)
+        when :bool
+          t_llvm.from_i(@value ? 1 : 0)
+        end
       end
     end
   end

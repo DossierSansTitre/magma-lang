@@ -1,10 +1,6 @@
 fun test() {
     foo();
-    bar(a(), b(), c()); baz(a());
 }
 
 fun foo() {
-    bar(c(), b(), a(c(), b()));
-    bar(c(), b(), a(c(), b()));
-    bar(c(), b(), a(c(), b()));
 }

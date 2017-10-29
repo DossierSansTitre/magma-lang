@@ -1,3 +1,6 @@
+require 'llvm/linker'
+require 'llvm/target'
+
 module Magma
   class TypeNative
     attr_reader :name
@@ -28,7 +31,7 @@ module Magma
     def to_llvm
       case @kind
       when :void
-        LLVM::Void
+        LLVM.Void
       when :int
         LLVM.const_get("Int#{@bits}")
       when :float

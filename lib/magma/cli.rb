@@ -27,8 +27,10 @@ module Magma
         reporter.report
         return
       end
-      ap parser.tokens
+      #ap parser.tokens
       ap ast
+      puts
+      puts
       obj_filename = nil
       if @driver.opts[:object]
         obj_filename = @driver.output

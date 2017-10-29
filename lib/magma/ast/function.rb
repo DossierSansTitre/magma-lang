@@ -6,6 +6,7 @@ module Magma
     class Function < Node
       attr_writer :type
       attr_writer :block
+      attr_reader :name
 
       def initialize(name)
         @name = name

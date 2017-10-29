@@ -1,7 +1,7 @@
-fun check_five(a: Int) -> Bool {
-    return a > 5;
-}
-
 fun main() -> Int {
-    return check_five(3);
+    var a: UInt8;
+
+    a = 7;
+    a = a + 16;
+    return a;
 }

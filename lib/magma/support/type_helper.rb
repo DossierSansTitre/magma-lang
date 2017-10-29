@@ -24,9 +24,17 @@ module Magma
               builder.ui2fp(value, dst_llvm)
             end
           when [:int, :int]
-            builder.int_cast(value, dst_llvm)
+            if dst_type.bits <= src_type.bits
+              builder.int_cast(value, dst_llvm)
+            elsif src_type.signed
+              builder.sext(value, dst_llvm)
+            else
+              builder.zext(value, dst_llvm)
+            end
           when [:int, :bool]
             builder.int_cast(value, dst_llvm)
+          when [:bool, :int]
+            builder.zext(value, dst_llvm)
           else
             builder.int_cast(value, dst_llvm)
           end

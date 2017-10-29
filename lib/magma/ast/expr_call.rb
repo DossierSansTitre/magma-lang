@@ -21,6 +21,10 @@ module Magma
         super(indent, @func_name)
       end
 
+      def type(ctx)
+        ctx.ast.function(@func_name).type(ctx)
+      end
+
       def generate(ctx)
         args = @arguments.map{ |a| a.generate(ctx) }
         ctx.builder.call(ctx.module.functions[Support::NameMangler.function(@func_name)], *args)

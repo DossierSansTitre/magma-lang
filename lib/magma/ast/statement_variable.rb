@@ -13,9 +13,9 @@ module Magma
       end
 
       def generate(ctx)
-        llvm_type = ctx.ast.types[@type].to_llvm
-        loc = ctx.builder.alloca(llvm_type, "var_#{@name}")
-        ctx.block.set_variable(@name, llvm_type, loc)
+        type = ctx.ast.types[@type]
+        loc = ctx.builder.alloca(type.to_llvm, "var_#{@name}")
+        ctx.block.set_variable(@name, type, loc)
       end
     end
   end

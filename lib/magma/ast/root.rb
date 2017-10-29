@@ -17,6 +17,10 @@ module Magma
         @functions << fun
       end
 
+      def function(name)
+        @functions.select{|x| x.name == name}.first
+      end
+
       def children
         @functions
       end

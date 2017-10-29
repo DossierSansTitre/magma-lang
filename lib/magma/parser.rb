@@ -268,7 +268,24 @@ module Magma
     end
 
     def parse_expr_binary_mul
-      parse_expr_binary([:mul, :div, :mod], :parse_expr_primary)
+      parse_expr_binary([:mul, :div, :mod], :parse_expr_unary)
+    end
+
+    def parse_expr_unary
+      op = nil
+      [:plus, :minus, :lnot, :not].each do |o|
+        tok = OPERATORS[o]
+        if accept(tok)
+          op = o
+          break
+        end
+      end
+      if op
+        expr = parse_expr_unary
+        AST::ExprUnary.new(op, expr)
+      else
+        parse_expr_primary
+      end
     end
 
     def parse_expr_primary

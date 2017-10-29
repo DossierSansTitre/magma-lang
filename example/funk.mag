@@ -1,7 +1,11 @@
-fun f() -> Float {
-    return 1.5;
+fun f() -> Double {
+    return 3.5;
+}
+
+fun square(a: Float) -> Float {
+    return a * a;
 }
 
 fun main() -> Int {
-    return f();
+    return square(f()) + 1.5f;
 }

@@ -118,6 +118,9 @@ module Magma
       end
       loop do
         c = stream_getc
+        if c.nil?
+          break
+        end
         tmp = id + c
         unless regex =~ tmp
           stream_putc c
@@ -202,7 +205,7 @@ module Magma
         stream_puts int_part
         return
       end
-      frac_part = scan_regex(/\A([0-9]*f)|([0-9]+)\z/)
+      frac_part = scan_regex(/\A(([0-9]*f)|([0-9]+))\z/)
       if frac_part.nil?
         stream_putc dot
         stream_puts int_part

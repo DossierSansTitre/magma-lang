@@ -65,39 +65,66 @@ module Magma
         lhs = Support::TypeHelper.cast(ctx.builder, lhs_type, t, lhs)
         rhs = Support::TypeHelper.cast(ctx.builder, rhs_type, t, rhs)
 
-        case @op
-        when :add
-          ctx.builder.add(lhs, rhs)
-        when :sub
-          ctx.builder.sub(lhs, rhs)
-        when :mul
-          ctx.builder.mul(lhs, rhs)
-        when :div
-          ctx.builder.sdiv(lhs, rhs)
-        when :mod
-          ctx.builder.srem(lhs, rhs)
-        when :eq
-          ctx.builder.icmp(:eq, lhs, rhs)
-        when :ne
-          ctx.builder.icmp(:ne, lhs, rhs)
-        when :gt
-          ctx.builder.icmp(:sgt, lhs, rhs)
-        when :ge
-          ctx.builder.icmp(:sge, lhs, rhs)
-        when :lt
-          ctx.builder.icmp(:slt, lhs, rhs)
-        when :le
-          ctx.builder.icmp(:sle, lhs, rhs)
-        when :or, :lor
-          ctx.builder.or(lhs, rhs)
-        when :and, :land
-          ctx.builder.and(lhs, rhs)
-        when :xor
-          ctx.builder.xor(lhs, rhs)
-        when :lshift
-          ctx.builder.shl(lhs, rhs)
-        when :rshift
-          ctx.builder.lshr(lhs, rhs)
+        if t.kind == :int || t.kind == :bool
+          case @op
+          when :add
+            ctx.builder.add(lhs, rhs)
+          when :sub
+            ctx.builder.sub(lhs, rhs)
+          when :mul
+            ctx.builder.mul(lhs, rhs)
+          when :div
+            ctx.builder.sdiv(lhs, rhs)
+          when :mod
+            ctx.builder.srem(lhs, rhs)
+          when :eq
+            ctx.builder.icmp(:eq, lhs, rhs)
+          when :ne
+            ctx.builder.icmp(:ne, lhs, rhs)
+          when :gt
+            ctx.builder.icmp(:sgt, lhs, rhs)
+          when :ge
+            ctx.builder.icmp(:sge, lhs, rhs)
+          when :lt
+            ctx.builder.icmp(:slt, lhs, rhs)
+          when :le
+            ctx.builder.icmp(:sle, lhs, rhs)
+          when :or, :lor
+            ctx.builder.or(lhs, rhs)
+          when :and, :land
+            ctx.builder.and(lhs, rhs)
+          when :xor
+            ctx.builder.xor(lhs, rhs)
+          when :lshift
+            ctx.builder.shl(lhs, rhs)
+          when :rshift
+            ctx.builder.lshr(lhs, rhs)
+          end
+        else
+          case @op
+          when :add
+            ctx.builder.fadd(lhs, rhs)
+          when :sub
+            ctx.builder.fsub(lhs, rhs)
+          when :mul
+            ctx.builder.fmul(lhs, rhs)
+          when :div
+            ctx.builder.fdiv(lhs, rhs)
+          when :mod
+            ctx.builder.frem(lhs, rhs)
+          when :eq
+            ctx.builder.fcmp(:eq, lhs, rhs)
+          when :ne
+            ctx.builder.fcmp(:ne, lhs, rhs)
+          when :gt
+            ctx.builder.fcmp(:sgt, lhs, rhs)
+          when :ge
+            ctx.builder.fcmp(:sge, lhs, rhs)
+          when :lt
+            ctx.builder.fcmp(:slt, lhs, rhs)
+          when :le
+            ctx.builder.fcmp(:sle, lhs, rhs)
+          end
         end
       end
     end

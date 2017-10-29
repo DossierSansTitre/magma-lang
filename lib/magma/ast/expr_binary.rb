@@ -1,6 +1,8 @@
+require 'magma/ast/expr'
+
 module Magma
   module AST
-    class BinaryExpr < Node
+    class ExprBinary < Expr
       attr_reader :op
       attr_reader :lhs
       attr_reader :rhs

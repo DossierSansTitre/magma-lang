@@ -1,6 +1,7 @@
 require 'magma/ast/block'
 require 'magma/ast/expr'
 require 'magma/ast/expr_assign'
+require 'magma/ast/expr_binary'
 require 'magma/ast/expr_call'
 require 'magma/ast/expr_identifier'
 require 'magma/ast/expr_literal'

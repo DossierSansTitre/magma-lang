@@ -22,7 +22,11 @@ module Magma
       :and  => :tand,
       :xor  => :txor,
       :lshift => :tlshift,
-      :rshift => :trshift
+      :rshift => :trshift,
+      :plus   => :tplus,
+      :minus  => :tminus,
+      :lnot   => :tbang,
+      :not    => :ttilde
     }
 
     def initialize(scanner, reporter)
@@ -222,7 +226,7 @@ module Magma
         end
         break if operation.nil?
         rhs = self.__send__(next_method)
-        e = AST::BinaryExpr.new(operation, e, rhs)
+        e = AST::ExprBinary.new(operation, e, rhs)
       end
       e
     end

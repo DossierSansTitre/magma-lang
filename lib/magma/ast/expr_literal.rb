@@ -2,7 +2,7 @@ require 'magma/ast/expr'
 
 module Magma
   module AST
-    class ExprLiteral < Node
+    class ExprLiteral < Expr
       def initialize(type, value)
         @type = type
         @value = value

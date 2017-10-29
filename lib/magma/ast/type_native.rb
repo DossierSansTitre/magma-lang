@@ -35,7 +35,14 @@ module Magma
       when :int
         LLVM.const_get("Int#{@bits}")
       when :float
-        LLVM.const_get("Float#{@bits}")
+        case @bits
+        when 64
+          LLVM::Double
+        when 32
+          LLVM::Float
+        else
+          nil
+        end
       when :bool
         LLVM::Int1
       end

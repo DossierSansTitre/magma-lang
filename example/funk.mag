@@ -1,0 +1,7 @@
+fun f() -> Float {
+    return 1.5;
+}
+
+fun main() -> Int {
+    return f();
+}

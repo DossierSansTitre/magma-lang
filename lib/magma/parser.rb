@@ -5,11 +5,24 @@ module Magma
     attr_reader :tokens
 
     OPERATORS = {
-      :add => :tplus,
-      :sub => :tminus,
-      :mul => :tmul,
-      :div => :tdiv,
-      :mod => :tmod
+      :add  => :tplus,
+      :sub  => :tminus,
+      :mul  => :tmul,
+      :div  => :tdiv,
+      :mod  => :tmod,
+      :eq   => :teq,
+      :ne   => :tne,
+      :gt   => :tgt,
+      :ge   => :tge,
+      :lt   => :tlt,
+      :le   => :tle,
+      :lor  => :tlor,
+      :land => :tland,
+      :or   => :tor,
+      :and  => :tand,
+      :xor  => :txor,
+      :lshift => :tlshift,
+      :rshift => :trshift
     }
 
     def initialize(scanner, reporter)
@@ -191,7 +204,7 @@ module Magma
     end
 
     def parse_expr
-      parse_expr_binary_add
+      parse_expr_binary_lor
     end
 
     def parse_expr_binary(op, next_method)
@@ -212,6 +225,38 @@ module Magma
         e = AST::BinaryExpr.new(operation, e, rhs)
       end
       e
+    end
+
+    def parse_expr_binary_lor
+      parse_expr_binary(:lor, :parse_expr_binary_land)
+    end
+
+    def parse_expr_binary_land
+      parse_expr_binary(:land, :parse_expr_binary_or)
+    end
+
+    def parse_expr_binary_or
+      parse_expr_binary(:or, :parse_expr_binary_xor)
+    end
+
+    def parse_expr_binary_xor
+      parse_expr_binary(:xor, :parse_expr_binary_and)
+    end
+
+    def parse_expr_binary_and
+      parse_expr_binary(:and, :parse_expr_binary_equal)
+    end
+
+    def parse_expr_binary_equal
+      parse_expr_binary([:eq, :ne], :parse_expr_binary_greater)
+    end
+
+    def parse_expr_binary_greater
+      parse_expr_binary([:gt, :ge, :lt, :le], :parse_expr_binary_shift)
+    end
+
+    def parse_expr_binary_shift
+      parse_expr_binary([:rshift, :lshift], :parse_expr_binary_add)
     end
 
     def parse_expr_binary_add

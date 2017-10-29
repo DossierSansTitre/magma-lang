@@ -34,22 +34,28 @@ module Magma
           builder.sdiv(lhs, rhs)
         when :mod
           builder.srem(lhs, rhs)
-        when :teq
+        when :eq
           builder.icmp(:eq, lhs, rhs)
-        when :tne
+        when :ne
           builder.icmp(:ne, lhs, rhs)
-        when :tg
+        when :gt
           builder.icmp(:sgt, lhs, rhs)
-        when :tge
+        when :ge
           builder.icmp(:sge, lhs, rhs)
-        when :tl
+        when :lt
           builder.icmp(:slt, lhs, rhs)
-        when :tle
+        when :le
           builder.icmp(:sle, lhs, rhs)
-        when :tor
+        when :or, :lor
           builder.or(lhs, rhs)
-        when :tand
+        when :and, :land
           builder.and(lhs, rhs)
+        when :xor
+          builder.xor(lhs, rhs)
+        when :lshift
+          builder.shl(lhs, rhs)
+        when :rshift
+          builder.lshr(lhs, rhs)
         end
       end
     end

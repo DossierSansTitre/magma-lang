@@ -1,0 +1,33 @@
+require 'magma/ast/expr'
+
+module Magma
+  module AST
+    class ExprUnary < Expr
+      def initialize(op, expr)
+        @op = op
+        @expr = expr
+      end
+
+      def children
+        [@expr]
+      end
+
+      def dump(indent)
+        super(indent, @op)
+      end
+
+      def generate(ast, block, builder)
+        expr = @expr.generate(ast, block, builder)
+
+        case @op
+        when :plus
+          expr
+        when :minus
+          builder.neg(expr)
+        when :lnot, :not
+          builder.not(expr)
+        end
+      end
+    end
+  end
+end

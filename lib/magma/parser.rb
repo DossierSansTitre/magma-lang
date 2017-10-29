@@ -4,6 +4,31 @@ module Magma
   class Parser
     attr_reader :tokens
 
+    OPERATORS = {
+      :add  => :tplus,
+      :sub  => :tminus,
+      :mul  => :tmul,
+      :div  => :tdiv,
+      :mod  => :tmod,
+      :eq   => :teq,
+      :ne   => :tne,
+      :gt   => :tgt,
+      :ge   => :tge,
+      :lt   => :tlt,
+      :le   => :tle,
+      :lor  => :tlor,
+      :land => :tland,
+      :or   => :tor,
+      :and  => :tand,
+      :xor  => :txor,
+      :lshift => :tlshift,
+      :rshift => :trshift,
+      :plus   => :tplus,
+      :minus  => :tminus,
+      :lnot   => :tbang,
+      :not    => :ttilde
+    }
+
     def initialize(scanner, reporter)
       @scanner = scanner
       @reporter = reporter
@@ -183,12 +208,106 @@ module Magma
     end
 
     def parse_expr
+      parse_expr_binary_lor
+    end
+
+    def parse_expr_binary(op, next_method)
+      e = self.__send__(next_method)
+      return if e.nil?
+      op = [op] unless op.is_a?(Array)
+      loop do
+        operation = nil
+        op.each do |o|
+          tok = OPERATORS[o]
+          if accept(tok)
+            operation = o
+            break
+          end
+        end
+        break if operation.nil?
+        rhs = self.__send__(next_method)
+        e = AST::ExprBinary.new(operation, e, rhs)
+      end
+      e
+    end
+
+    def parse_expr_binary_lor
+      parse_expr_binary(:lor, :parse_expr_binary_land)
+    end
+
+    def parse_expr_binary_land
+      parse_expr_binary(:land, :parse_expr_binary_or)
+    end
+
+    def parse_expr_binary_or
+      parse_expr_binary(:or, :parse_expr_binary_xor)
+    end
+
+    def parse_expr_binary_xor
+      parse_expr_binary(:xor, :parse_expr_binary_and)
+    end
+
+    def parse_expr_binary_and
+      parse_expr_binary(:and, :parse_expr_binary_equal)
+    end
+
+    def parse_expr_binary_equal
+      parse_expr_binary([:eq, :ne], :parse_expr_binary_greater)
+    end
+
+    def parse_expr_binary_greater
+      parse_expr_binary([:gt, :ge, :lt, :le], :parse_expr_binary_shift)
+    end
+
+    def parse_expr_binary_shift
+      parse_expr_binary([:rshift, :lshift], :parse_expr_binary_add)
+    end
+
+    def parse_expr_binary_add
+      parse_expr_binary([:add, :sub], :parse_expr_binary_mul)
+    end
+
+    def parse_expr_binary_mul
+      parse_expr_binary([:mul, :div, :mod], :parse_expr_unary)
+    end
+
+    def parse_expr_unary
+      op = nil
+      [:plus, :minus, :lnot, :not].each do |o|
+        tok = OPERATORS[o]
+        if accept(tok)
+          op = o
+          break
+        end
+      end
+      if op
+        expr = parse_expr_unary
+        AST::ExprUnary.new(op, expr)
+      else
+        parse_expr_primary
+      end
+    end
+
+    def parse_expr_primary
       expr = nil
+      expr ||= parse_expr_paren
       expr ||= parse_expr_assign
       expr ||= parse_expr_call
       expr ||= parse_expr_literal
       expr ||= parse_expr_identifier
       expr
+    end
+
+    def parse_expr_paren
+      save
+      unless accept(:tlparen)
+        restore
+        return
+      end
+      e = parse_expr
+      accept(:trparen)
+      commit
+      e
     end
 
     def parse_expr_assign
@@ -238,6 +357,13 @@ module Magma
     end
 
     def parse_expr_literal
+      e = nil
+      e ||= parse_expr_literal_num
+      e ||= parse_expr_literal_bool
+      e
+    end
+
+    def parse_expr_literal_num
       save
       num = accept(:number)
       if num.nil?
@@ -246,6 +372,14 @@ module Magma
       end
       commit
       AST::ExprLiteral.new("Int", num.number)
+    end
+
+    def parse_expr_literal_bool
+      if accept(:ktrue)
+        AST::ExprLiteral.new("Bool", true)
+      elsif accept(:kfalse)
+        AST::ExprLiteral.new("Bool", false)
+      end
     end
 
     def parse_expr_identifier

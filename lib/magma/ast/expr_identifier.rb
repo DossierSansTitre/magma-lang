@@ -1,6 +1,8 @@
+require 'magma/ast/expr'
+
 module Magma
   module AST
-    class ExprIdentifier < Node
+    class ExprIdentifier < Expr
       def initialize(name)
         @name = name
       end

@@ -13,7 +13,9 @@ module Magma
       'if'      => :kif,
       'else'    => :kelse,
       'while'   => :kwhile,
-      'for'     => :kfor
+      'for'     => :kfor,
+      'true'    => :ktrue,
+      'false'   => :kfalse,
     }
 
     SYMBOLS = {
@@ -25,7 +27,27 @@ module Magma
       ','   => :tcomma,
       ';'   => :tsemicolon,
       ':'   => :tcolon,
-      '='   => :tassign
+      '+'   => :tplus,
+      '-'   => :tminus,
+      '*'   => :tmul,
+      '/'   => :tdiv,
+      '%'   => :tmod,
+      '>>'  => :trshift,
+      '<<'  => :tlshift,
+      '=='  => :teq,
+      '!='  => :tne,
+      '>='  => :tge,
+      '>'   => :tgt,
+      '<='  => :tle,
+      '<'   => :tlt,
+      '||'  => :tlor,
+      '&&'  => :tland,
+      '|'   => :tor,
+      '&'   => :tand,
+      '^'   => :txor,
+      '~'   => :ttilde,
+      '!'   => :tbang,
+      '='   => :tassign,
     }
 
     def initialize(filename, stream, reporter)

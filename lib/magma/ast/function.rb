@@ -1,4 +1,4 @@
-require 'magma/ast/block'
+require 'magma/ast/node'
 require 'magma/support/name_mangler'
 
 module Magma

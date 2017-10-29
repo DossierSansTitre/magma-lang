@@ -1,4 +1,4 @@
-require 'magma/ast/function'
+require 'magma/ast/node'
 require 'magma/ast/type_system'
 require 'llvm/linker'
 

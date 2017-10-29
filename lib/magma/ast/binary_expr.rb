@@ -11,20 +11,28 @@ module Magma
         @rhs = rhs
       end
 
+      def children
+        [@lhs, @rhs]
+      end
+
+      def dump(indent)
+        super(indent, @op)
+      end
+
       def generate(ast, block, builder)
         lhs = @lhs.generate(ast, block, builder)
         rhs = @rhs.generate(ast, block, builder)
 
         case @op
-        when :tplus
+        when :add
           builder.add(lhs, rhs)
-        when :tminus
+        when :sub
           builder.sub(lhs, rhs)
-        when :tmul
+        when :mul
           builder.mul(lhs, rhs)
-        when :tdiv
+        when :div
           builder.sdiv(lhs, rhs)
-        when :tmod
+        when :mod
           builder.srem(lhs, rhs)
         when :teq
           builder.icmp(:eq, lhs, rhs)

@@ -4,6 +4,14 @@ module Magma
   class Parser
     attr_reader :tokens
 
+    OPERATORS = {
+      :add => :tplus,
+      :sub => :tminus,
+      :mul => :tmul,
+      :div => :tdiv,
+      :mod => :tmod
+    }
+
     def initialize(scanner, reporter)
       @scanner = scanner
       @reporter = reporter
@@ -156,7 +164,7 @@ module Magma
     end
 
     def parse_statement_expr
-      e = parse_or
+      e = parse_expr
       return if e.nil?
       save
       unless accept(:tsemicolon)
@@ -173,7 +181,7 @@ module Magma
         restore
         return
       end
-      e = parse_or
+      e = parse_expr
       unless accept(:tsemicolon)
         restore
         return
@@ -182,73 +190,41 @@ module Magma
       AST::StatementReturn.new(e)
     end
 
-    def parse_or
-      expr = parse_and
-      while (a = accept(:tor))
-        expr = AST::BinaryExpr.new(:tor, expr, parse_and)
-      end
-      expr
-    end
-
-    def parse_and
-      expr = parse_equality
-      while (a = accept(:tand))
-        expr = AST::BinaryExpr.new(:tand, expr, parse_equality)
-      end
-      expr
-    end
-
-    def parse_equality
-      expr = parse_relation
-      loop do
-        a = nil
-        a ||= accept(:teq)
-        a ||= accept(:tne)
-        break unless a
-        expr = AST::BinaryExpr.new(a.type, expr, parse_relation)
-      end
-      expr
-    end
-
-    def parse_relation
-      expr = parse_expr
-      loop do
-        a = nil
-        a ||= accept(:tg)
-        a ||= accept(:tge)
-        a ||= accept(:tl)
-        a ||= accept(:tle)
-        break unless a
-        expr = AST::BinaryExpr.new(a.type, expr, parse_expr)
-      end
-      expr
-    end
-
-    def parse_factor
-      factor = nil
-      factor ||= parse_expr_paren
-      factor ||= parse_expr_literal
-      factor ||= parse_expr_call
-      factor ||= parse_expr_identifier
-      factor ||= parse_boolean_identifier
-      factor
-    end
-
-    def parse_term
-      term = parse_unary
-      loop do
-        a = nil
-        a ||= accept(:tmul)
-        a ||= accept(:tdiv)
-        a ||= accept(:tmod)
-        break unless a
-        term = AST::BinaryExpr.new(a.type, term, parse_term)
-      end
-      term
-    end
-
     def parse_expr
+      parse_expr_binary_add
+    end
+
+    def parse_expr_binary(op, next_method)
+      e = self.__send__(next_method)
+      return if e.nil?
+      op = [op] unless op.is_a?(Array)
+      loop do
+        operation = nil
+        op.each do |o|
+          tok = OPERATORS[o]
+          if accept(tok)
+            operation = o
+            break
+          end
+        end
+        break if operation.nil?
+        rhs = self.__send__(next_method)
+        e = AST::BinaryExpr.new(operation, e, rhs)
+      end
+      e
+    end
+
+    def parse_expr_binary_add
+      parse_expr_binary([:add, :sub], :parse_expr_binary_mul)
+    end
+
+    def parse_expr_binary_mul
+      parse_expr_binary([:mul, :div, :mod], :parse_expr_primary)
+    end
+
+    def parse_expr_primary
       expr = nil
+      expr ||= parse_expr_paren
       expr ||= parse_expr_assign
       expr ||= parse_expr_call
       expr ||= parse_expr_literal
@@ -256,7 +232,18 @@ module Magma
       expr
     end
 
-<<<<<<< HEAD
+    def parse_expr_paren
+      save
+      unless accept(:tlparen)
+        restore
+        return
+      end
+      e = parse_expr
+      accept(:trparen)
+      commit
+      e
+    end
+
     def parse_expr_assign
       save
       name = accept(:identifier)
@@ -277,17 +264,6 @@ module Magma
       AST::ExprAssign.new(name.str, expr)
     end
 
-    def parse_unary
-      a = nil
-      a ||= accept(:tminus)
-      a ||= accept(:tbang)
-      if a
-        AST::UnaryExpr.new(a.type, parse_unary)
-      else
-        parse_factor
-      end
-    end
-
     def parse_expr_call
       save
       id = accept(:identifier)
@@ -301,7 +277,7 @@ module Magma
       end
       call = AST::ExprCall.new(id.str)
       loop do
-        e = parse_or
+        e = parse_expr
         break if e.nil?
         call.add_argument(e)
         break unless accept(:tcomma)
@@ -312,25 +288,6 @@ module Magma
       end
       commit
       call
-    end
-
-    def parse_expr_paren
-      save
-      unless accept(:tlparen)
-        restore
-        return
-      end
-      e = parse_or
-      if e.nil?
-        restore
-        return
-      end
-      unless accept(:trparen)
-        restore
-        return
-      end
-      commit
-      e
     end
 
     def parse_expr_literal
@@ -353,20 +310,6 @@ module Magma
       end
       commit
       AST::ExprIdentifier.new(id.str)
-    end
-
-    def parse_boolean_identifier
-      save
-      bool = nil
-      bool ||= accept(:ktrue)
-      bool ||= accept(:kfalse)
-      unless bool
-        restore
-        return
-      end
-      commit
-      p bool
-      AST::ExprLiteral.new("Bool", bool.type == :ktrue ? 1 : 0)
     end
   end
 end

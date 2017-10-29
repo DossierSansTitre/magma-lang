@@ -27,14 +27,12 @@ module Magma
       ','   => :tcomma,
       ';'   => :tsemicolon,
       ':'   => :tcolon,
-      '='   => :tassign,
       '+'   => :tplus,
       '-'   => :tminus,
       '*'   => :tmul,
       '/'   => :tdiv,
       '%'   => :tmod,
       '=='  => :teq,
-      '='   => :tasg,
       '!='  => :tne,
       '!'   => :tbang,
       '>='  => :tge,
@@ -43,6 +41,7 @@ module Magma
       '<'   => :tl,
       '||'  => :tor,
       '&&'  => :tand,
+      '='   => :tassign,
     }
 
     def initialize(filename, stream, reporter)

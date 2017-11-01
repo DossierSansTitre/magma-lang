@@ -24,7 +24,6 @@ module Magma
       ast = parser.parse
 
       if reporter.error?
-        reporter.report
         return
       end
       #ap parser.tokens

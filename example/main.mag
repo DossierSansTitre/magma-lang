@@ -1,5 +1,5 @@
 fun test(a: UInt8, b: UInt8) -> UInt16 {
-    return a * a * b;
+    return a * a $ * b;
 }
 
 fun main() -> Int {

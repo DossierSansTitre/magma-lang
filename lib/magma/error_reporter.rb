@@ -1,41 +1,36 @@
+require 'colorize'
+
 module Magma
   class ErrorReporter
-    class Error
-      attr_reader :severity
-      attr_reader :message
-      attr_reader :location
-
-      def initialize(severity, message, location)
-        @severity = severity
-        @message = message
-        @location = location
-      end
-    end
+    COLORS = {
+      :error    => :red,
+      :warning  => :magenta
+    }
 
     def initialize
-      @errors = []
+      @stats = {}
     end
 
-    def push(severity, message, location)
-      @errors << Error.new(severity, message, location)
+    def report(severity, message, location)
+      @stats[severity] ||= 0
+      @stats[severity] += 1
+      print "#{location}: ".white.bold
+      print "#{severity}: ".colorize(COLORS[severity]).bold
+      print "#{message}\n".white.bold
+      print "#{location.text.chomp}\n"
+      print "#{' ' * location.column}^\n".green.bold
     end
 
     def error(message, location)
-      push(:error, message, location)
+      report(:error, message, location)
     end
 
     def warn(message, location)
-      push(:warning, message, location)
-    end
-
-    def report
-      @errors.each do |err|
-        puts "#{err.severity}: #{err.location}: #{err.message}"
-      end
+      report(:warning, message, location)
     end
 
     def error?
-      @errors.any?
+      !@stats[:error].nil?
     end
   end
 end

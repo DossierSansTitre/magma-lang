@@ -63,7 +63,7 @@ module Magma
         return k if v == tok
       end
       SYMBOLS.each do |k, v|
-        return k if v == tok
+        return "`#{k}`" if v == tok
       end
       tok.to_s
     end

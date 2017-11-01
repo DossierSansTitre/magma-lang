@@ -96,24 +96,14 @@ module Magma
     end
 
     def parse_block
-      save
-      lparen = accept(:tlbrace)
-      if lparen.nil?
-        restore
-        return
-      end
+      accept(:tlbrace) or return
       block = AST::Block.new
       loop do
         statement = parse_statement
         break if statement.nil?
         block.add_statement(statement)
       end
-      rparen = accept(:trbrace)
-      if rparen.nil?
-        restore
-        return
-      end
-      commit
+      accept!(:trbrace)
       block
     end
 
@@ -149,49 +139,24 @@ module Magma
     end
 
     def parse_statement_variable
-      save
-      unless accept(:kvar)
-        restore
-        return
-      end
-      name = accept(:identifier)
-      unless accept(:tcolon)
-        restore
-        return
-      end
-      type = accept(:identifier)
-      unless accept(:tsemicolon)
-        restore
-        return
-      end
-      commit
+      accept(:kvar) or return
+      name = accept!(:identifier) or return
+      accept!(:tcolon) or return
+      type = accept!(:identifier) or return
+      accept!(:tsemicolon) or return
       return AST::StatementVariable.new(name.str, type.str)
     end
 
     def parse_statement_expr
-      e = parse_expr
-      return if e.nil?
-      save
-      unless accept(:tsemicolon)
-        restore
-        return
-      end
-      commit
+      e = parse_expr or return
+      accept!(:tsemicolon) or return
       AST::StatementExpr.new(e)
     end
 
     def parse_statement_return
-      save
-      unless accept(:kreturn)
-        restore
-        return
-      end
+      accept(:kreturn) or return
       e = parse_expr
-      unless accept(:tsemicolon)
-        restore
-        return
-      end
-      commit
+      accept!(:tsemicolon) or return
       AST::StatementReturn.new(e)
     end
 
@@ -287,14 +252,13 @@ module Magma
     end
 
     def parse_expr_paren
-      save
-      unless accept(:tlparen)
-        restore
+      lparen = accept(:tlparen) or return
+      e = parse_expr
+      if e.nil?
+        @reporter.error("expected expression", lparen.source_loc)
         return
       end
-      e = parse_expr
-      accept(:trparen)
-      commit
+      accept!(:trparen) or return
       e
     end
 
@@ -305,16 +269,17 @@ module Magma
         restore
         return
       end
-      unless accept(:tassign)
-        restore
-        return
-      end
-      expr = parse_expr
-      if expr.nil?
+      assign = accept(:tassign)
+      if assign.nil?
         restore
         return
       end
       commit
+      expr = parse_expr
+      if expr.nil?
+        @reporter.error("expected expression", assign.source_loc)
+        return
+      end
       AST::ExprAssign.new(name.str, expr)
     end
 
@@ -329,6 +294,7 @@ module Magma
         restore
         return
       end
+      commit
       call = AST::ExprCall.new(id.str)
       loop do
         e = parse_expr
@@ -336,11 +302,7 @@ module Magma
         call.add_argument(e)
         break unless accept(:tcomma)
       end
-      unless accept(:trparen)
-        restore
-        return
-      end
-      commit
+      accept!(:trparen) or return
       call
     end
 
@@ -352,17 +314,11 @@ module Magma
     end
 
     def parse_expr_literal_num
-      save
-      num = accept(:number)
-      if num.nil?
-        restore
-        return
-      end
-      commit
+      num = accept(:number) or return
       case num.number_type
       when :int
         AST::ExprLiteral.new("Int", num.number)
-      when :unsigned_int
+      when :uint
         AST::ExprLiteral.new("UInt", num.number)
       when :float32
         AST::ExprLiteral.new("Float32", num.number)
@@ -380,13 +336,7 @@ module Magma
     end
 
     def parse_expr_identifier
-      save
-      id = accept(:identifier)
-      if id.nil?
-        restore
-        return
-      end
-      commit
+      id = accept(:identifier) or return
       AST::ExprIdentifier.new(id.str)
     end
   end

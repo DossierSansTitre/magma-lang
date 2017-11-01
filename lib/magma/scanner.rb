@@ -52,6 +52,8 @@ module Magma
 
     def self.token_name(tok)
       case tok
+      when nil
+        return "EOF"
       when :identifier
         return "identifier"
       when :number

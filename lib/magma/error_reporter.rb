@@ -18,7 +18,7 @@ module Magma
       print "#{severity}: ".colorize(COLORS[severity]).bold
       print "#{message}\n".white.bold
       print "#{location.text.chomp}\n"
-      print "#{' ' * location.column}^\n".green.bold
+      print "#{' ' * location.column}^#{'~' * (location.length - 1)}\n".green.bold
     end
 
     def error(message, location)

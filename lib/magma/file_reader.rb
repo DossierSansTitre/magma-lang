@@ -27,7 +27,7 @@ module Magma
       if pattern.is_a?(String)
         str = @ss.peek(pattern.size)
         if str == pattern
-          match = Match.new(str, nil, source_loc)
+          match = Match.new(str, nil, source_loc(pattern.size))
           advance(str)
           @ss.pos = @ss.pos + pattern.size
         end
@@ -35,7 +35,7 @@ module Magma
         m = @ss.scan(pattern)
         if m
           m = pattern.match(m)
-          match = Match.new(m[0], m, source_loc)
+          match = Match.new(m[0], m, source_loc(m[0].size))
           advance(m[0])
         end
       end
@@ -52,8 +52,8 @@ module Magma
       match
     end
 
-    def source_loc
-      SourceLoc.new(@file_buffer, @line, @column)
+    def source_loc(length = 1)
+      SourceLoc.new(@file_buffer, @line, @column, length)
     end
 
     private

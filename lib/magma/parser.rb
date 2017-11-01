@@ -45,10 +45,6 @@ module Magma
           @ast.add_function(node)
           next
         end
-        t = pop_token
-        unless t.nil?
-          @reporter.error("Unexpected token, expected EOF", t.source_loc)
-        end
         break
       end
       @ast
@@ -74,6 +70,17 @@ module Magma
       return t if t.type == type
       push_token
       nil
+    end
+
+    def accept!(type)
+      tok = pop_token
+      tok_type = tok&.type
+      if tok_type != type
+        @reporter.error("expected #{Scanner.token_name(type)}, got #{Scanner.token_name(tok_type)}", tok.source_loc)
+        push_token
+        return nil
+      end
+      tok
     end
 
     def save
@@ -111,43 +118,24 @@ module Magma
     end
 
     def parse_function
-      save
-      unless accept(:kfun)
-        restore
-        return
-      end
-      id = accept(:identifier)
-      if id.nil?
-        restore
-        return
-      end
-      unless accept(:tlparen)
-        restore
-        return
-      end
+      return unless accept(:kfun)
+      id = accept!(:identifier) or return
+      accept!(:tlparen) or return
       function = AST::Function.new(id.str)
       loop do
         i = accept(:identifier)
         break if i.nil?
-        accept(:tcolon)
-        t = accept(:identifier)
+        accept!(:tcolon) or return
+        t = accept!(:identifier) or return
         function.add_param(AST::FunctionParam.new(i.str, t.str))
         break unless accept(:tcomma)
       end
-      unless accept(:trparen)
-        restore
-        return
-      end
+      accept!(:trparen)
       if accept(:tarrow)
-        type = accept(:identifier)
+        type = accept!(:identifier) or return
         function.type = type.str
       end
-      b = parse_block
-      if b.nil?
-        restore
-        return
-      end
-      commit
+      b = parse_block or return
       function.block = b
       function
     end

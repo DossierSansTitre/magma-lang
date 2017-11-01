@@ -3,11 +3,13 @@ module Magma
     attr_reader :file
     attr_reader :line
     attr_reader :column
+    attr_reader :length
 
-    def initialize(file, line, column)
+    def initialize(file, line, column, length = 1)
       @file = file
       @line = line
       @column = column
+      @length = length
     end
 
     def filename

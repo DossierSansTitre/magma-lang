@@ -4,6 +4,7 @@ require 'magma/error_reporter'
 require 'magma/codegen'
 require 'magma/driver'
 require 'magma/compiler_driver'
+require 'magma/file_buffer'
 
 module Magma
   class CLI
@@ -16,15 +17,13 @@ module Magma
       if filename.nil?
         exit 1
       end
-      f = File.open(filename, 'rb')
+      f = FileBuffer.open(filename)
       reporter = ErrorReporter.new
-      scanner = Scanner.new(filename, f, reporter)
+      scanner = Scanner.new(f, reporter)
       parser = Parser.new(scanner, reporter)
       ast = parser.parse
-      f.close
 
       if reporter.error?
-        reporter.report
         return
       end
       #ap parser.tokens

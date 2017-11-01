@@ -1,5 +1,6 @@
 require 'magma/source_loc'
 require 'magma/token'
+require 'magma/file_reader'
 
 module Magma
   class Scanner
@@ -49,146 +50,65 @@ module Magma
       '='   => :tassign,
     }
 
-    def initialize(filename, stream, reporter)
-      @filename = filename
-      @stream = stream
+    def self.token_name(tok)
+      case tok
+      when :identifier
+        return "identifier"
+      when :number
+        return "number"
+      end
+      KEYWORDS.each do |k, v|
+        return k if v == tok
+      end
+      SYMBOLS.each do |k, v|
+        return k if v == tok
+      end
+      tok.to_s
+    end
+
+    def initialize(file_buffer, reporter)
+      @reader = FileReader.new(file_buffer)
       @reporter = reporter
-      @rollback = []
-      @line = 1
-      @column = 1
     end
 
     def next_token
       skip_ws
       tok = nil
       tok ||= scan_symbol
-      tok ||= scan_keyword
       tok ||= scan_identifier
       tok ||= scan_number
+      if tok.nil?
+        check_eof
+      end
       tok
     end
 
     private
-    def stream_getc
-      @column += 1
-      @rollback.shift || @stream.getc
-    end
-
-    def stream_putc(c)
-      @column -= 1
-      @rollback.unshift c
-    end
-
-    def stream_gets(size)
-      buf = ""
-      size.times do
-        c = stream_getc
-        if c.nil?
-          stream_puts buf
-          return nil
-        end
-        buf << c
-      end
-      buf
-    end
-
-    def stream_puts(str)
-      str.reverse.each_char {|c| stream_putc c}
-    end
-
     def skip_ws
-      loop do
-        c = stream_getc
-        if c == "\n"
-          @line += 1
-          @column = 1
-        end
-        unless [" ", "\n", "\t", "\v", "\f"].include?(c)
-          stream_putc c
-          break
-        end
-      end
+      @reader.scan(/[ \n\r\t\f]+/)
     end
 
-    def scan_regex(regex)
-      id = stream_getc
-      unless regex =~ id
-        stream_putc id
-        return
-      end
-      loop do
-        c = stream_getc
-        if c.nil?
-          break
-        end
-        tmp = id + c
-        unless regex =~ tmp
-          stream_putc c
-          break
-        end
-        id = tmp
-      end
-      id
-    end
-
-    def scan_regex_prefix(prefix, regex)
-      pre = stream_gets(prefix.size)
-      if pre.nil?
-        return
-      end
-      if pre != prefix
-        stream_puts(pre)
-        return
-      end
-      body = scan_regex(regex)
-      if body.nil?
-        stream_puts(pre)
-        return
-      end
-      pre + body
-    end
-
-    def identifier
-      scan_regex(IDENTIFIER)
-    end
-
-    def keyword
-      id = identifier
-      return nil if id.nil?
-      k = KEYWORDS[id]
-      if k.nil?
-        stream_puts id
-        return nil
-      end
-      k
-    end
-
-    def symbol
+    def scan_symbol
       SYMBOLS.each do |key, value|
-        size = key.size
-        str = stream_gets(size)
-        next if str.nil?
-        if key != str
-          stream_puts str
-          next
+        m = @reader.scan(key)
+        if m
+          return Token.new(value, m.source_loc)
         end
-        return value
       end
       nil
     end
 
-    def scan_keyword
-      loc = source_loc
-      k = keyword
-      return if k.nil?
-      Token.new(k, loc)
-    end
-
     def scan_identifier
-      loc = source_loc
-      id = identifier
-      return if id.nil?
-      TokenString.new(:identifier, id, loc)
+      id = @reader.scan(/\A[a-zA-Z_][a-zA-Z0-9_]*/)
+      if id
+        KEYWORDS.each do |key, value|
+          if id.str == key
+            return Token.new(value, id.source_loc)
+          end
+        end
+        return TokenString.new(:identifier, id.str, id.source_loc)
+      end
+      nil
     end
 
     def scan_number
@@ -196,28 +116,17 @@ module Magma
     end
 
     def scan_number_float
-      loc = source_loc
-      int_part = scan_regex(/\A[0-9]+\z/)
-      return if int_part.nil?
-      dot = stream_getc
-      if dot != '.'
-        stream_putc dot unless dot.nil?
-        stream_puts int_part
-        return
+      f = @reader.scan(/\A[0-9]+\.([0-9]*f|[0-9]+)/)
+      if f
+        str = f.str
+        type = :float64
+        if str[-1] == 'f'
+          type = :float32
+          str = str[0..-2]
+        end
+        return TokenNumber.new(str.to_f, type, f.source_loc)
       end
-      frac_part = scan_regex(/\A(([0-9]*f)|([0-9]+))\z/)
-      if frac_part.nil?
-        stream_putc dot
-        stream_puts int_part
-        return
-      end
-      str = int_part + '.' + frac_part
-      t = :float64
-      if str[-1] == 'f'
-        str = str[0..-2]
-        t = :float32
-      end
-      TokenNumber.new(str.to_f, t, loc)
+      nil
     end
 
     def scan_number_int
@@ -230,56 +139,47 @@ module Magma
     end
 
     def scan_number_int_bin
-      loc = source_loc
-      str = scan_regex_prefix("0b", /\A[0-1]+\z/)
-      return if str.nil?
-      str = str[2..-1]
-      TokenNumber.new(str.to_i(2), :unsigned_int, loc)
+      num = @reader.scan(/\A0b([0-1]+)/)
+      if num
+        str = num.match[1]
+        return TokenNumber.new(str.to_i(2), :uint, num.source_loc)
+      end
+      nil
     end
 
     def scan_number_int_oct
-      loc = source_loc
-      str = scan_regex_prefix("0o", /\A[0-7]+\z/)
-      str ||= scan_regex_prefix("0", /\A[0-7]+\z/)
-      return if str.nil?
-      p str
-      if str[1] == 'o'
-        str = str[2..-1]
-      else
-        str = str[1..-1]
+      num = @reader.scan(/\A0o?([0-7]+)/)
+      if num
+        return TokenNumber.new(num.match[1].to_i(8), :uint, num.source_loc)
       end
-      TokenNumber.new(str.to_i(8), :unsigned_int, loc)
+      nil
     end
 
     def scan_number_int_hex
-      loc = source_loc
-      str = scan_regex_prefix("0x", /\A[0-9a-fA-F]+\z/)
-      return if str.nil?
-      str = str[2..-1]
-      TokenNumber.new(str.to_i(16), :unsigned_int, loc)
+      num = @reader.scan(/\A0x([0-9a-fA-F]+)/)
+      if num
+        return TokenNumber.new(num.match[1].to_i(16), :uint, num.source_loc)
+      end
+      nil
     end
 
     def scan_number_int_dec
-      loc = source_loc
-      str = scan_regex(/\A[0-9]+u?\z/)
-      return if str.nil?
-      t = :int
-      if str[-1] == 'u'
-        str = str[0..-2]
-        t = :unsigned_int
+      num = @reader.scan(/\A(?:0d)?([0-9]+)u?/)
+      if num
+        type = :int
+        if num.str[-1] == 'u'
+          type = :uint
+        end
+        return TokenNumber.new(num.match[1].to_i(10), type, num.source_loc)
       end
-      TokenNumber.new(str.to_i(10), t, loc)
+      nil
     end
 
-    def scan_symbol
-      loc = source_loc
-      s = symbol
-      return if s.nil?
-      Token.new(s, loc)
-    end
-
-    def source_loc
-      SourceLoc.new(@filename, @line, @column)
+    def check_eof
+      c = @reader.getc
+      if c
+        @reporter.error("syntax error: unknown token", c.source_loc)
+      end
     end
   end
 end

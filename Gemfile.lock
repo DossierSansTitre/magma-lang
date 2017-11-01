@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     awesome_print (1.8.0)
+    colorize (0.8.1)
     ffi (1.9.18)
     rake (10.5.0)
     ruby-llvm (3.5.0)
@@ -13,6 +14,7 @@ PLATFORMS
 
 DEPENDENCIES
   awesome_print!
+  colorize!
   rake!
   ruby-llvm (~> 3.5.0)!
 

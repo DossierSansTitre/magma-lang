@@ -4,6 +4,7 @@ module Magma
   module AST
     class FunctionParam < Node
       attr_reader :name
+      attr_reader :type_str
 
       def initialize(name, type_str)
         @name = name

@@ -7,6 +7,7 @@ module Magma
     class Root < Node
       attr_reader :types
       attr_reader :module
+      attr_reader :functions
 
       def initialize
         @functions = []
@@ -31,6 +32,10 @@ module Magma
         @functions.each {|f| f.generate(ctx, false)}
         @functions.each {|f| f.generate(ctx, true)}
         nil
+      end
+
+      def visited(v, *args)
+        v.root(self, *args)
       end
     end
   end

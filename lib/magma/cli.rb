@@ -1,3 +1,4 @@
+require 'tmpdir'
 require 'magma/scanner'
 require 'magma/parser'
 require 'magma/error_reporter'
@@ -6,6 +7,7 @@ require 'magma/driver'
 require 'magma/compiler_driver'
 require 'magma/file_buffer'
 require 'magma/compile_tree_builder'
+require 'magma/code_gen'
 
 module Magma
   class CLI
@@ -29,7 +31,9 @@ module Magma
       end
       #ap parser.tokens
       ap ast
-      ctb = CompileTreeBuilder.run(ast)
+      ct = CompileTreeBuilder.run(ast)
+      mod = CodeGen.generate(ct)
+      mod.dump
       puts
       puts
       obj_filename = nil

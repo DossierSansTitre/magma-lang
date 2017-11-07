@@ -12,6 +12,10 @@ module Magma
         @type = type
         @args = args
       end
+
+      def visited(v)
+        v.function_decl(self)
+      end
     end
   end
 end

@@ -3,6 +3,8 @@ require 'magma/ast/node'
 module Magma
   module AST
     class StatementReturn < Node
+      attr_reader :expr
+
       def initialize(expr = nil)
         @expr = expr
       end
@@ -21,6 +23,10 @@ module Magma
           value = Support::TypeHelper.cast(ctx.builder, in_type, ret_type, value)
           ctx.builder.ret(value)
         end
+      end
+
+      def visited(v)
+        v.statement_return(self)
       end
     end
   end

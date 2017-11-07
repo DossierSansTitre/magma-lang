@@ -4,6 +4,8 @@ require 'magma/ast/variable'
 module Magma
   module AST
     class Block < Node
+      attr_reader :statements
+
       def initialize
         @statements = []
         @vars = {}
@@ -32,6 +34,10 @@ module Magma
           ctx.builder = builder
           @statements.each {|s| s.generate(ctx)}
         end
+      end
+
+      def visited(v)
+        v.block(self)
       end
     end
   end

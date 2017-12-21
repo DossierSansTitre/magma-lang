@@ -7,8 +7,8 @@ module Magma
     class Generator
       include Visitor
 
-      def self.run(compile_tree)
-        Generator.new.visit(compile_tree)
+      def self.run(sema)
+        Generator.new.visit(sema)
       end
 
       def root(ct)

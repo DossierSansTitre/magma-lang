@@ -6,7 +6,7 @@ require 'magma/codegen'
 require 'magma/driver'
 require 'magma/compiler_driver'
 require 'magma/file_buffer'
-require 'magma/compile_tree_builder'
+require 'magma/sema_builder'
 require 'magma/code_gen'
 
 module Magma
@@ -31,7 +31,7 @@ module Magma
       end
       #ap parser.tokens
       ap ast
-      ct = CompileTreeBuilder.run(ast)
+      ct = SemaBuilder.run(ast)
       mod = CodeGen.generate(ct)
       mod.dump
       puts

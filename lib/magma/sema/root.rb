@@ -1,9 +1,9 @@
-require 'magma/compile_tree/node'
-require 'magma/compile_tree/function_decl'
-require 'magma/compile_tree/function'
+require 'magma/sema/node'
+require 'magma/sema/function_decl'
+require 'magma/sema/function'
 
 module Magma
-  module CompileTree
+  module Sema
     class Root < Node
       attr_reader :types
       attr_reader :function_decls

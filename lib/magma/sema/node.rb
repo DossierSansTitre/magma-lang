@@ -1,5 +1,5 @@
 module Magma
-  module CompileTree
+  module Sema
     class Node
     end
   end

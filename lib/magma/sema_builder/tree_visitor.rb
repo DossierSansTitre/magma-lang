@@ -1,8 +1,8 @@
 require 'magma/visitor'
-require 'magma/compile_tree_builder/function_visitor.rb'
+require 'magma/sema_builder/function_visitor.rb'
 
 module Magma
-  module CompileTreeBuilder
+  module SemaBuilder
     class TreeVisitor
       include Visitor
 

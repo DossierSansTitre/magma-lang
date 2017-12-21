@@ -2,8 +2,8 @@ require 'magma/code_gen/generator'
 
 module Magma
   module CodeGen
-    def self.generate(compile_tree)
-      Generator.run(compile_tree)
+    def self.generate(sema)
+      Generator.run(sema)
     end
   end
 end

@@ -1,7 +1,7 @@
 require 'magma/visitor'
 
 module Magma
-  module CompileTreeBuilder
+  module SemaBuilder
     class FunctionVisitor
       include Visitor
 

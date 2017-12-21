@@ -1,0 +1,1 @@
+require 'magma/sema/root'

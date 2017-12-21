@@ -1,8 +1,8 @@
-require 'magma/compile_tree/node'
-require 'magma/compile_tree/basic_block'
+require 'magma/sema/node'
+require 'magma/sema/basic_block'
 
 module Magma
-  module CompileTree
+  module Sema
     class Function < Node
       attr_reader :decl
       attr_reader :basic_blocks

@@ -1,7 +1,7 @@
-require 'magma/compile_tree/node'
+require 'magma/sema/node'
 
 module Magma
-  module CompileTree
+  module Sema
     class StatementExpr
       def initialize(expr)
         @expr = expr

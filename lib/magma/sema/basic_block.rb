@@ -1,8 +1,8 @@
-require 'magma/compile_tree/node'
-require 'magma/compile_tree/statement_return'
+require 'magma/sema/node'
+require 'magma/sema/statement_return'
 
 module Magma
-  module CompileTree
+  module Sema
     class BasicBlock < Node
       attr_reader :id
       attr_reader :statements

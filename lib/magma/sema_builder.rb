@@ -1,10 +1,10 @@
-require 'magma/compile_tree'
-require 'magma/compile_tree_builder/tree_visitor'
+require 'magma/sema'
+require 'magma/sema_builder/tree_visitor'
 
 module Magma
-  module CompileTreeBuilder
+  module SemaBuilder
     def self.run(ast)
-      ct = CompileTree::Root.new
+      ct = Sema::Root.new
       build_function_decls(ct, ast)
       ct
     end

@@ -1,7 +1,10 @@
 require 'magma/sema'
+require 'magma/visitor'
 
 module Magma
   class SemaBuilder
+    include Visitor
+
     def self.run(ast)
       builder = self.new(ast)
       builder.build
@@ -36,6 +39,12 @@ module Magma
 
     def build_fun(sema_fun, ast_fun)
       bb = sema_fun.add_basic_block
+      ast_fun.block.statements.each do |stmt|
+        visit(stmt, bb, sema_fun)
+      end
+    end
+
+    def statement_return(stmt, bb, sema_fun)
       bb.add_return
     end
   end

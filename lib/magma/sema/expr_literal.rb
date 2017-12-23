@@ -7,6 +7,10 @@ module Magma
         @type = type
         @literal = literal
       end
+
+      def visited(v, *args)
+        v.expr_literal(*args)
+      end
     end
   end
 end

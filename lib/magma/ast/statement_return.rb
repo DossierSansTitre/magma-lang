@@ -25,8 +25,8 @@ module Magma
         end
       end
 
-      def visited(v)
-        v.statement_return(self)
+      def visited(v, *args)
+        v.statement_return(self, *args)
       end
     end
   end

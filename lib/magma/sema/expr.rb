@@ -4,6 +4,7 @@ require 'magma/sema/expr_call'
 require 'magma/sema/expr_cast'
 require 'magma/sema/expr_literal'
 require 'magma/sema/expr_unary'
+require 'magma/sema/expr_variable'
 
 module Magma
   module Sema
@@ -35,6 +36,10 @@ module Magma
 
       def self.unary(op, expr)
         ExprUnary.new(op, expr)
+      end
+
+      def self.variable(id, type)
+        ExprVariable.new(id, type)
       end
     end
   end

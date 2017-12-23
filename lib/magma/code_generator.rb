@@ -147,5 +147,11 @@ module Magma
         end
       end
     end
+
+    def expr_variable(expr, llvm_bb, bb_table, var_table)
+      llvm_bb.build do |builder|
+        return builder.load(var_table[expr.id])
+      end
+    end
   end
 end

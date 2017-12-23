@@ -4,6 +4,8 @@ require 'magma/support/type_helper'
 module Magma
   module AST
     class ExprBinary < Expr
+      visited_as :expr_binary
+
       LOGICAL_IN = [
         :lor,
         :land

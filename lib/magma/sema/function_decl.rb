@@ -13,6 +13,14 @@ module Magma
         @args = args
       end
 
+      def mangled_name
+        if name == "main"
+          "magma_main"
+        else
+          "magmafun@#{name}"
+        end
+      end
+
       def visited(v)
         v.function_decl(self)
       end

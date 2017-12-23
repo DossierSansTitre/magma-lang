@@ -62,5 +62,11 @@ module Magma
       sema_type = @sema.types[type]
       Sema::Expr.literal(sema_type, value)
     end
+
+    def expr_binary(expr, bb, sema_fun)
+      lhs = visit(expr.lhs, bb, sema_fun)
+      rhs = visit(expr.rhs, bb, sema_fun)
+      Sema::Expr.binary(expr.op, lhs, rhs)
+    end
   end
 end

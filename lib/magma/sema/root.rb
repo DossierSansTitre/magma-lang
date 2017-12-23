@@ -10,6 +10,7 @@ module Magma
       attr_reader :functions
 
       def initialize
+        @decls_with_name = {}
         @function_decls = {}
         @functions = {}
         @types = TypeSystem.new
@@ -21,12 +22,14 @@ module Magma
 
       def add_function_decl(name, type, arg_types)
         decl = FunctionDecl.new(name, type, arg_types)
-        @function_decls[name] = decl
+        @function_decls[decl.mangled_name] = decl
+        (@decls_with_name[name] ||= []) << decl
+        decl
       end
 
       def add_function(decl)
         f = Function.new(decl)
-        @functions[f.name] = f
+        @functions[f.mangled_name] = f
       end
     end
   end

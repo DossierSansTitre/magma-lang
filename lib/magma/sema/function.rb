@@ -20,6 +20,10 @@ module Magma
         @decl.name
       end
 
+      def mangled_name
+        @decl.mangled_name
+      end
+
       def visited(v)
         v.function(self)
       end

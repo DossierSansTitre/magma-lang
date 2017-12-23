@@ -1,4 +1,5 @@
 require 'magma/sema/expr_binary'
+require 'magma/sema/expr_call'
 require 'magma/sema/expr_cast'
 require 'magma/sema/expr_literal'
 require 'magma/sema/expr_unary'
@@ -12,6 +13,10 @@ module Magma
 
       def self.literal(type, value)
         ExprLiteral.new(type, value)
+      end
+
+      def self.call(decl, exprs)
+        ExprCall.new(decl, exprs)
       end
 
       def self.cast(type, expr)

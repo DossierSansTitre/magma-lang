@@ -1,3 +1,8 @@
+fun foo() -> Int {
+    return 5;
+}
+
 fun main() -> Int {
-    return -(5 + 5);
+    foo();
+    return foo();
 }

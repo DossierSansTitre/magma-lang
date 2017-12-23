@@ -4,8 +4,12 @@ require 'magma/support/name_mangler'
 module Magma
   module AST
     class ExprCall < Expr
-      def initialize(func_name)
-        @func_name = func_name
+      visited_as :expr_call
+
+      attr_reader :name
+
+      def initialize(name)
+        @name = name
         @arguments = []
       end
 
@@ -18,11 +22,11 @@ module Magma
       end
 
       def dump(indent = 0)
-        super(indent, @func_name)
+        super(indent, @name)
       end
 
       def type(ctx)
-        ctx.ast.function(@func_name).type(ctx)
+        ctx.ast.function(@name).type(ctx)
       end
 
       def generate(ctx)

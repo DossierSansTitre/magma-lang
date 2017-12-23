@@ -31,6 +31,10 @@ module Magma
         f = Function.new(decl)
         @functions[f.mangled_name] = f
       end
+
+      def decls_with_name(name)
+        @decls_with_name[name]
+      end
     end
   end
 end

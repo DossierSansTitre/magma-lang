@@ -66,6 +66,14 @@ module Magma
       expr.type.value(expr.value)
     end
 
+    def expr_call(expr, llvm_bb, table)
+      mangled_name = expr.decl.mangled_name
+      f = @mod.functions[mangled_name]
+      llvm_bb.build do |builder|
+        return builder.call(f)
+      end
+    end
+
     def expr_binary(expr, llvm_bb, table)
       lhs = visit(expr.lhs, llvm_bb, table)
       rhs = visit(expr.rhs, llvm_bb, table)

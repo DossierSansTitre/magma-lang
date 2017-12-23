@@ -73,5 +73,11 @@ module Magma
       e = visit(expr.expr, bb, sema_fun)
       Sema::Expr.unary(expr.op, e)
     end
+
+    def expr_call(expr, bb, sema_fun)
+      fun_name = expr.name
+      decl = @sema.decls_with_name(fun_name).first
+      Sema::Expr.call(decl, [])
+    end
   end
 end

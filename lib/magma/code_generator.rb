@@ -53,7 +53,12 @@ module Magma
 
     def statement_return(stmt, llvm_bb, table)
       llvm_bb.build do |builder|
-        builder.ret_void
+        if stmt.expr.nil?
+          builder.ret_void
+        else
+          v = visit(stmt.expr, llvm_bb, table)
+          builder.ret(v)
+        end
       end
     end
 

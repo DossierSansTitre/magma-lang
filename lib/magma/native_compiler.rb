@@ -1,5 +1,6 @@
 require 'llvm/target'
 require 'llvm/transforms/builder'
+require 'llvm/analysis'
 
 module Magma
   class NativeCompiler
@@ -22,6 +23,7 @@ module Magma
         pm.run(@mod)
       end
       @mod.dump
+      @mod.verify!
       tm.emit(@mod, @filename, :object)
     end
   end

@@ -46,7 +46,10 @@ module Magma
     end
 
     def statement_return(stmt, bb, sema_fun)
-      bb.add_return
+      unless stmt.expr.nil?
+        expr = visit(stmt.expr, bb, sema_fun)
+      end
+      bb.add_return(expr)
     end
 
     def statement_expr(stmt, bb, sema_fun)

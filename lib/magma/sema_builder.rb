@@ -68,5 +68,10 @@ module Magma
       rhs = visit(expr.rhs, bb, sema_fun)
       Sema::Expr.binary(expr.op, lhs, rhs)
     end
+
+    def expr_unary(expr, bb, sema_fun)
+      e = visit(expr.expr, bb, sema_fun)
+      Sema::Expr.unary(expr.op, e)
+    end
   end
 end

@@ -3,6 +3,11 @@ require 'magma/ast/expr'
 module Magma
   module AST
     class ExprUnary < Expr
+      visited_as :expr_unary
+
+      attr_reader :op
+      attr_reader :expr
+
       def initialize(op, expr)
         @op = op
         @expr = expr

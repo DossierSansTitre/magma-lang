@@ -107,5 +107,20 @@ module Magma
         end
       end
     end
+
+    def expr_unary(expr, llvm_bb, table)
+      e = visit(expr.expr, llvm_bb, table)
+
+      llvm_bb.build do |builder|
+        case expr.op
+        when :plus
+          return e
+        when :minus
+          return builder.neg(e)
+        when :lnot, :not
+          return builder.not(e)
+        end
+      end
+    end
   end
 end

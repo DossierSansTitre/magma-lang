@@ -1,6 +1,7 @@
-require 'magma/sema/expr_literal'
 require 'magma/sema/expr_binary'
 require 'magma/sema/expr_cast'
+require 'magma/sema/expr_literal'
+require 'magma/sema/expr_unary'
 
 module Magma
   module Sema
@@ -20,6 +21,10 @@ module Magma
         else
           ExprCast.new(type, expr)
         end
+      end
+
+      def self.unary(op, expr)
+        ExprUnary.new(op, expr)
       end
     end
   end

@@ -20,6 +20,10 @@ module Magma
       def add_return(expr = nil)
         @statements << StatementReturn.new(expr)
       end
+
+      def add_expr(expr)
+        @statements << expr
+      end
     end
   end
 end

@@ -3,13 +3,16 @@ require 'magma/sema/node'
 module Magma
   module Sema
     class ExprLiteral < Node
-      def initialize(type, literal)
+      attr_reader :type
+      attr_reader :value
+
+      def initialize(type, value)
         @type = type
-        @literal = literal
+        @value = value
       end
 
       def visited(v, *args)
-        v.expr_literal(*args)
+        v.expr_literal(self, *args)
       end
     end
   end

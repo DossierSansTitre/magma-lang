@@ -1,4 +1,5 @@
 require 'magma/sema'
+require 'magma/sema/expr'
 require 'magma/visitor'
 
 module Magma
@@ -46,6 +47,17 @@ module Magma
 
     def statement_return(stmt, bb, sema_fun)
       bb.add_return
+    end
+
+    def statement_expr(stmt, bb, sema_fun)
+      bb.add_expr(visit(stmt.expr, bb, sema_fun))
+    end
+
+    def expr_literal(expr, bb, sema_fun)
+      type = expr.type
+      value = expr.value
+      sema_type = @sema.types[type]
+      Sema::Expr.literal(sema_type, value)
     end
   end
 end

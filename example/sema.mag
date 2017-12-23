@@ -1,0 +1,4 @@
+fun main() {
+    5;
+    return 5;
+}

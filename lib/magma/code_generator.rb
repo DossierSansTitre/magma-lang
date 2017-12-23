@@ -56,5 +56,9 @@ module Magma
         builder.ret_void
       end
     end
+
+    def expr_literal(expr, llvm_bb, table)
+      expr.type.value(expr.value)
+    end
   end
 end

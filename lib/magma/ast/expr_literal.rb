@@ -3,17 +3,20 @@ require 'magma/ast/expr'
 module Magma
   module AST
     class ExprLiteral < Expr
+      attr_reader :type
+      attr_reader :value
+
       def initialize(type, value)
         @type = type
         @value = value
       end
 
-      def type(ctx)
-        ctx.ast.types[@type]
-      end
-
       def dump(indent = 0)
         super(indent, "#{@value}:#{@type}")
+      end
+
+      def visited(v, *args)
+        v.expr_literal(self, *args)
       end
 
       def generate(ctx)

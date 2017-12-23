@@ -40,41 +40,49 @@ module Magma
 
     def build_fun(sema_fun, ast_fun)
       bb = sema_fun.add_basic_block
+      var_table = {}
       ast_fun.block.statements.each do |stmt|
-        visit(stmt, bb, sema_fun)
+        visit(stmt, bb, sema_fun, var_table)
       end
     end
 
-    def statement_return(stmt, bb, sema_fun)
+    def statement_return(stmt, bb, sema_fun, var_table)
       unless stmt.expr.nil?
-        expr = visit(stmt.expr, bb, sema_fun)
+        expr = visit(stmt.expr, bb, sema_fun, var_table)
       end
       bb.add_return(expr)
     end
 
-    def statement_expr(stmt, bb, sema_fun)
-      bb.add_expr(visit(stmt.expr, bb, sema_fun))
+    def statement_expr(stmt, bb, sema_fun, var_table)
+      bb.add_expr(visit(stmt.expr, bb, sema_fun, var_table))
     end
 
-    def expr_literal(expr, bb, sema_fun)
+    def statement_variable(stmt, bb, sema_fun, var_table)
+      name = stmt.name
+      type = @sema.types[stmt.type]
+      id = sema_fun.add_var(type)
+      var_table[name] = id
+    end
+
+    def expr_literal(expr, bb, sema_fun, var_table)
       type = expr.type
       value = expr.value
       sema_type = @sema.types[type]
       Sema::Expr.literal(sema_type, value)
     end
 
-    def expr_binary(expr, bb, sema_fun)
-      lhs = visit(expr.lhs, bb, sema_fun)
-      rhs = visit(expr.rhs, bb, sema_fun)
+    def expr_binary(expr, bb, sema_fun, var_table)
+      lhs = visit(expr.lhs, bb, sema_fun, var_table)
+      rhs = visit(expr.rhs, bb, sema_fun, var_table)
       Sema::Expr.binary(expr.op, lhs, rhs)
     end
 
-    def expr_unary(expr, bb, sema_fun)
-      e = visit(expr.expr, bb, sema_fun)
+    def expr_unary(expr, bb, sema_fun, var_table)
+      e = visit(expr.expr, bb, sema_fun, var_table)
       Sema::Expr.unary(expr.op, e)
     end
 
-    def expr_call(expr, bb, sema_fun)
+    def expr_call(expr, bb, sema_fun, var_table)
       fun_name = expr.name
       decl = @sema.decls_with_name(fun_name).first
       Sema::Expr.call(decl, [])

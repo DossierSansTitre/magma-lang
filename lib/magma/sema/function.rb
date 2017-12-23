@@ -6,10 +6,12 @@ module Magma
     class Function < Node
       attr_reader :decl
       attr_reader :basic_blocks
+      attr_reader :vars
 
       def initialize(decl)
         @decl = decl
         @basic_blocks = []
+        @vars = []
       end
 
       def type
@@ -32,6 +34,12 @@ module Magma
         b = BasicBlock.new(@basic_blocks.size)
         @basic_blocks << b
         b
+      end
+
+      def add_var(type)
+        id = @vars.size
+        @vars << type
+        id
       end
     end
   end

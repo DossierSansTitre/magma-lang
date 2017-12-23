@@ -1,4 +1,5 @@
 fun foo() -> Int {
+    var a: Int;
     return 5;
 }
 

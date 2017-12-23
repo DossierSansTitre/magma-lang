@@ -35,10 +35,19 @@ module Magma
       table = {}
       block_pairs = []
       llvm_fun = @mod.functions[fun.mangled_name]
+      first_block = nil
       fun.basic_blocks.each do |sema_bb|
         llvm_bb = llvm_fun.basic_blocks.append
+        first_block ||= llvm_bb
         table[sema_bb.id] = llvm_bb
         block_pairs << [llvm_bb, sema_bb]
+      end
+      var_table = []
+      first_block.build do |builder|
+        fun.vars.each do |var|
+          addr = builder.alloca(var.to_llvm)
+          var_table << addr
+        end
       end
       block_pairs.each do |pair|
         generate_basic_block(*pair, table)

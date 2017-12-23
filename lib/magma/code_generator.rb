@@ -32,14 +32,14 @@ module Magma
     end
 
     def generate_fun(fun)
-      table = {}
+      bb_table = {}
       block_pairs = []
       llvm_fun = @mod.functions[fun.mangled_name]
       first_block = nil
       fun.basic_blocks.each do |sema_bb|
         llvm_bb = llvm_fun.basic_blocks.append
         first_block ||= llvm_bb
-        table[sema_bb.id] = llvm_bb
+        bb_table[sema_bb.id] = llvm_bb
         block_pairs << [llvm_bb, sema_bb]
       end
       var_table = []
@@ -50,32 +50,40 @@ module Magma
         end
       end
       block_pairs.each do |pair|
-        generate_basic_block(*pair, table)
+        generate_basic_block(*pair, bb_table, var_table)
       end
     end
 
-    def generate_basic_block(llvm_bb, sema_bb, table)
+    def generate_basic_block(llvm_bb, sema_bb, bb_table, var_table)
       sema_bb.statements.each do |stmt|
-        visit(stmt, llvm_bb, table)
+        visit(stmt, llvm_bb, bb_table, var_table)
       end
     end
 
-    def statement_return(stmt, llvm_bb, table)
+    def statement_return(stmt, llvm_bb, bb_table, var_table)
       llvm_bb.build do |builder|
         if stmt.expr.nil?
           builder.ret_void
         else
-          v = visit(stmt.expr, llvm_bb, table)
+          v = visit(stmt.expr, llvm_bb, bb_table, var_table)
           builder.ret(v)
         end
       end
     end
 
-    def expr_literal(expr, llvm_bb, table)
+    def expr_assign(expr, llvm_bb, bb_table, var_table)
+      e = visit(expr.expr, llvm_bb, bb_table, var_table)
+      llvm_bb.build do |builder|
+        addr = var_table[expr.id]
+        builder.store(e, addr)
+      end
+    end
+
+    def expr_literal(expr, llvm_bb, bb_table, var_table)
       expr.type.value(expr.value)
     end
 
-    def expr_call(expr, llvm_bb, table)
+    def expr_call(expr, llvm_bb, bb_table, var_table)
       mangled_name = expr.decl.mangled_name
       f = @mod.functions[mangled_name]
       llvm_bb.build do |builder|
@@ -83,9 +91,9 @@ module Magma
       end
     end
 
-    def expr_binary(expr, llvm_bb, table)
-      lhs = visit(expr.lhs, llvm_bb, table)
-      rhs = visit(expr.rhs, llvm_bb, table)
+    def expr_binary(expr, llvm_bb, bb_table, var_table)
+      lhs = visit(expr.lhs, llvm_bb, bb_table, var_table)
+      rhs = visit(expr.rhs, llvm_bb, bb_table, var_table)
 
       llvm_bb.build do |builder|
         case expr.op
@@ -125,8 +133,8 @@ module Magma
       end
     end
 
-    def expr_unary(expr, llvm_bb, table)
-      e = visit(expr.expr, llvm_bb, table)
+    def expr_unary(expr, llvm_bb, bb_table, var_table)
+      e = visit(expr.expr, llvm_bb, bb_table, var_table)
 
       llvm_bb.build do |builder|
         case expr.op

@@ -3,6 +3,11 @@ require 'magma/ast/expr'
 module Magma
   module AST
     class ExprAssign < Expr
+      visited_as :expr_assign
+
+      attr_reader :name
+      attr_reader :expr
+
       def initialize(name, expr)
         @name = name
         @expr = expr

@@ -20,23 +20,6 @@ module Magma
       def dump(indent)
         super(indent, @op)
       end
-
-      def type(ctx)
-        @expr.type(ctx)
-      end
-
-      def generate(ctx)
-        expr = @expr.generate(ctx)
-
-        case @op
-        when :plus
-          expr
-        when :minus
-          ctx.builder.neg(expr)
-        when :lnot, :not
-          ctx.builder.not(expr)
-        end
-      end
     end
   end
 end

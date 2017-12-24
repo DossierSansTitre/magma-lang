@@ -11,16 +11,8 @@ module Magma
         @name = name
       end
 
-      def type(ctx)
-        ctx.block.variable(@name).type
-      end
-
       def dump(indent = 0)
         super(indent, @name)
-      end
-
-      def generate(ctx)
-        ctx.builder.load(ctx.block.variable(@name).value)
       end
     end
   end

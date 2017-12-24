@@ -1,5 +1,4 @@
 require 'magma/ast/node'
-require 'magma/support/name_mangler'
 
 module Magma
   module AST
@@ -26,14 +25,6 @@ module Magma
 
       def dump(indent = 0)
         super(indent, "#{@name} -> #{@type}")
-      end
-
-      def mangled_name
-        Support::NameMangler.function(@name)
-      end
-
-      def visited(v)
-        v.function(self)
       end
     end
   end

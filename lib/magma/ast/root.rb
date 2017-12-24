@@ -22,10 +22,6 @@ module Magma
       def children
         @functions
       end
-
-      def visited(v, *args)
-        v.root(self, *args)
-      end
     end
   end
 end

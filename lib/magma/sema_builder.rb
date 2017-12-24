@@ -76,6 +76,12 @@ module Magma
         block_next = sema_fun.add_basic_block
         @block_stack << block_next
       end
+      if block_true.returned? == false
+        block_true.add_jump(block_next)
+      end
+      if block_false && block_false.returned? == false
+        block_false.add_jump(block_next)
+      end
       if block_false
         block_current.add_cond(e, block_true, block_false)
       else

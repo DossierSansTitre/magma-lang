@@ -1,14 +1,17 @@
-fun main() -> Int {
-    var a: Int;
+fun abs(a: Int) -> UInt {
+    var b: UInt;
 
-    a = 5;
-
-    if (a < 3)
+    if (a < 0)
     {
-        return 0;
+        b = -a;
     }
     else
     {
-        return 1;
+        b = a;
     }
+    return b;
+}
+
+fun main() -> Int {
+    return abs(-5);
 }

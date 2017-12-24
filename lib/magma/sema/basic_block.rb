@@ -1,6 +1,7 @@
 require 'magma/sema/node'
-require 'magma/sema/statement_return'
 require 'magma/sema/statement_cond'
+require 'magma/sema/statement_jump'
+require 'magma/sema/statement_return'
 
 module Magma
   module Sema
@@ -29,7 +30,13 @@ module Magma
       end
 
       def add_cond(expr, block_true, block_false)
+        @returned = true
         @statements << StatementCond.new(expr, block_true, block_false)
+      end
+
+      def add_jump(block)
+        @returned = true
+        @statements << StatementJump.new(block)
       end
     end
   end

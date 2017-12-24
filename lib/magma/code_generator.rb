@@ -82,6 +82,12 @@ module Magma
       end
     end
 
+    def statement_jump(stmt, llvm_bb, sema_fun, bb_table, var_table)
+      llvm_bb.build do |builder|
+        return builder.br(bb_table[stmt.block.id])
+      end
+    end
+
     def statement_return(stmt, llvm_bb, sema_fun, bb_table, var_table)
       unless stmt.expr.nil?
         v = visit(stmt.expr, llvm_bb, sema_fun, bb_table, var_table)

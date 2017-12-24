@@ -9,8 +9,8 @@ require 'magma/sema/expr_variable'
 module Magma
   module Sema
     module Expr
-      def self.assign(id, expr)
-        ExprAssign.new(id, expr)
+      def self.assign(id, type, expr)
+        ExprAssign.new(id, type, expr)
       end
 
       def self.binary(op, lhs, rhs)

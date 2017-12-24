@@ -1,6 +1,7 @@
 require 'magma/sema/node'
 require 'magma/sema/function_decl'
 require 'magma/sema/function'
+require 'magma/sema/type_system'
 
 module Magma
   module Sema

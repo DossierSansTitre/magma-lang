@@ -1,5 +1,4 @@
 require 'magma/ast/expr'
-require 'magma/support/type_helper'
 
 module Magma
   module AST
@@ -39,6 +38,7 @@ module Magma
       end
 
       def internal_type(ctx)
+=begin
         if LOGICAL_IN.include?(@op)
           ctx.ast.types.find_minimal(:bool, 1)
         else
@@ -46,18 +46,21 @@ module Magma
           rhs_type = @rhs.type(ctx)
           ctx.ast.types.result_type(lhs_type, rhs_type)
         end
-
+=end
       end
 
       def type(ctx)
+=begin
         if LOGICAL_OUT.include?(@op)
           ctx.ast.types.find_minimal(:bool, 1)
         else
           internal_type(ctx)
         end
+=end
       end
 
       def generate(ctx)
+=begin
         lhs = @lhs.generate(ctx)
         rhs = @rhs.generate(ctx)
         t = internal_type(ctx)
@@ -128,6 +131,7 @@ module Magma
             ctx.builder.fcmp(:sle, lhs, rhs)
           end
         end
+=end
       end
     end
   end

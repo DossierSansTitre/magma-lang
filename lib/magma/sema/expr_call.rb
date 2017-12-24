@@ -12,6 +12,10 @@ module Magma
         @decl = decl
         @exprs = exprs
       end
+
+      def type
+        @decl.type
+      end
     end
   end
 end

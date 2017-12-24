@@ -12,7 +12,7 @@ module Magma
       end
 
       def dump(indent)
-        super(indent, "#{@name}: #{@type_str}")
+        super(indent, "#{@name}: #{@type}")
       end
     end
   end

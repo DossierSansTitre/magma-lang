@@ -1,5 +1,8 @@
 fun foo(a: Int) -> Int {
-    return a * a;
+    var b: Float;
+
+    b = a;
+    return b * b;
 }
 
 fun main() -> Int {

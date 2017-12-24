@@ -17,7 +17,7 @@ module Magma
         if name == "main"
           "magma_main"
         else
-          "magmafun@#{name}"
+          "MAGMA##{name}"
         end
       end
 

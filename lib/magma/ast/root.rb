@@ -1,6 +1,4 @@
 require 'magma/ast/node'
-require 'magma/ast/type_system'
-require 'llvm/linker'
 
 module Magma
   module AST
@@ -11,7 +9,6 @@ module Magma
 
       def initialize
         @functions = []
-        @types = TypeSystem.new
       end
 
       def add_function(fun)
@@ -24,14 +21,6 @@ module Magma
 
       def children
         @functions
-      end
-
-      def generate(ctx)
-        ctx.ast = self
-        ctx.module = LLVM::Module.new("Magma")
-        @functions.each {|f| f.generate(ctx, false)}
-        @functions.each {|f| f.generate(ctx, true)}
-        nil
       end
 
       def visited(v, *args)

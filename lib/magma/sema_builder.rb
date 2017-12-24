@@ -72,8 +72,9 @@ module Magma
     def expr_assign(expr, bb, sema_fun, var_table)
       name = expr.name
       id = var_table[name]
+      type = sema_fun.vars[id]
       e = visit(expr.expr, bb, sema_fun, var_table)
-      Sema::Expr.assign(id, e)
+      Sema::Expr.assign(id, type, e)
     end
 
     def expr_identifier(expr, bb, sema_fun, var_table)

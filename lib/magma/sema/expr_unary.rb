@@ -1,8 +1,8 @@
-require 'magma/ast/expr'
+require 'magma/sema/node'
 
 module Magma
-  module AST
-    class ExprUnary < Expr
+  module Sema
+    class ExprUnary < Node
       visited_as :expr_unary
 
       attr_reader :op
@@ -13,12 +13,8 @@ module Magma
         @expr = expr
       end
 
-      def children
-        [@expr]
-      end
-
-      def dump(indent)
-        super(indent, @op)
+      def type
+        @expr.type
       end
     end
   end

@@ -1,0 +1,10 @@
+fun foo(a: Int) -> Int {
+    var b: Float;
+
+    b = a;
+    return b * b;
+}
+
+fun main() -> Int {
+    return foo(5);
+}

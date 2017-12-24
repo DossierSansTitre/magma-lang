@@ -1,10 +1,8 @@
-require 'magma/ast/expr'
+require 'magma/sema/node'
 
 module Magma
-  module AST
-    class ExprLiteral < Expr
-      visited_as :expr_literal
-
+  module Sema
+    class ExprLiteral < Node
       attr_reader :type
       attr_reader :value
 
@@ -13,8 +11,8 @@ module Magma
         @value = value
       end
 
-      def dump(indent = 0)
-        super(indent, "#{@value}:#{@type}")
+      def visited(v, *args)
+        v.expr_literal(self, *args)
       end
     end
   end

@@ -1,31 +1,30 @@
 require 'llvm/target'
 require 'llvm/transforms/builder'
-require 'magma/support/codegen_context'
+require 'llvm/analysis'
 
 module Magma
-  class Codegen
-    def initialize(ast, filename, optimize)
-      @ast = ast
+  class NativeCompiler
+    def initialize(mod, filename, optimize)
+      @mod = mod
       @filename = filename
       @optimize = optimize
     end
 
     def generate
-      ctx = Support::CodegenContext.new
-      @ast.generate(ctx)
       LLVM::Target.init_native(true)
       target = LLVM::Target.each.first
       tm = target.create_machine("x86_64-apple-darwin")
       if @optimize
         pmb = LLVM::PassManagerBuilder.new
-        pmb.opt_level = 2
+        pmb.opt_level = 3
         pmb.unroll_loops = true
         pm = LLVM::PassManager.new(tm)
         pmb.build(pm)
-        pm.run(ctx.module)
+        pm.run(@mod)
       end
-      ctx.module.dump
-      tm.emit(ctx.module, @filename, :object)
+      @mod.dump
+      @mod.verify!
+      tm.emit(@mod, @filename, :object)
     end
   end
 end

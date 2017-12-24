@@ -1,10 +1,13 @@
+require 'tmpdir'
 require 'magma/scanner'
 require 'magma/parser'
 require 'magma/error_reporter'
-require 'magma/codegen'
 require 'magma/driver'
 require 'magma/compiler_driver'
 require 'magma/file_buffer'
+require 'magma/sema_builder'
+require 'magma/native_compiler'
+require 'magma/code_generator'
 
 module Magma
   class CLI
@@ -26,18 +29,17 @@ module Magma
       if reporter.error?
         return
       end
-      #ap parser.tokens
       ap ast
-      puts
-      puts
+      sema = SemaBuilder.run(ast)
+      mod = CodeGenerator.run(sema)
       obj_filename = nil
       if @driver.opts[:object]
         obj_filename = @driver.output
       else
         obj_filename = Dir::Tmpname.create(['magma-', '.o']) { }
       end
-      codegen = Codegen.new(ast, obj_filename, @driver.optimize)
-      codegen.generate
+      nc = NativeCompiler.new(mod, obj_filename, @driver.optimize)
+      nc.generate
       unless @driver.opts[:object]
         cc = CompilerDriver.new
         cc.compile([File.join(File.dirname(__FILE__), '..', '..', 'libexec', 'magma_rt.o'), obj_filename], @driver.output)

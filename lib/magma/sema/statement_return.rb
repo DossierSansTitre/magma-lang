@@ -1,18 +1,16 @@
-require 'magma/ast/node'
+require 'magma/sema/node'
 
 module Magma
-  module AST
+  module Sema
     class StatementReturn < Node
-      visited_as :statement_return
-
       attr_reader :expr
 
       def initialize(expr = nil)
         @expr = expr
       end
 
-      def children
-        [@expr].reject(&:nil?)
+      def visited(v, *args)
+        v.statement_return(self, *args)
       end
     end
   end

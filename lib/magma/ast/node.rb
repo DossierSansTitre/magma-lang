@@ -1,6 +1,10 @@
+require 'magma/visitor'
+
 module Magma
   module AST
-    class Node 
+    class Node
+      include Visitable
+
       def children
         []
       end

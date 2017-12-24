@@ -7,6 +7,7 @@ module Magma
       visited_as :expr_call
 
       attr_reader :name
+      attr_reader :arguments
 
       def initialize(name)
         @name = name

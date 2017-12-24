@@ -12,6 +12,7 @@ module Magma
         @decl = decl
         @basic_blocks = []
         @vars = []
+        @decl.args.each { |x| add_var(x) }
       end
 
       def type

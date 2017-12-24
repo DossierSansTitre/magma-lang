@@ -28,7 +28,10 @@ module Magma
     def generate_decl(decl)
       type = decl.type.to_llvm
       name = decl.mangled_name
-      @mod.functions.add(name, [], type)
+      d = @mod.functions.add(name, decl.args.map(&:to_llvm), type)
+      d.params.each_with_index do |param, i|
+        param.name = "arg#{i}"
+      end
     end
 
     def generate_fun(fun)
@@ -44,9 +47,15 @@ module Magma
       end
       var_table = []
       first_block.build do |builder|
+        # Allocate variables
         fun.vars.each do |var|
           addr = builder.alloca(var.to_llvm)
           var_table << addr
+        end
+
+        # Load func args into local variables
+        llvm_fun.params.each.with_index do |param, i|
+          builder.store(param, var_table[i])
         end
       end
       block_pairs.each do |pair|
@@ -86,8 +95,11 @@ module Magma
     def expr_call(expr, llvm_bb, bb_table, var_table)
       mangled_name = expr.decl.mangled_name
       f = @mod.functions[mangled_name]
+      args = expr.exprs.map { |a|
+        visit(a, llvm_bb, bb_table, var_table)
+      }
       llvm_bb.build do |builder|
-        return builder.call(f)
+        return builder.call(f, *args)
       end
     end
 

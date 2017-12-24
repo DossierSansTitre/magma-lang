@@ -27,7 +27,9 @@ module Magma
         text_type = ast_fun.type
         type = @sema.types[text_type]
         name = ast_fun.name
-        decl = @sema.add_function_decl(name, type, [])
+        params = ast_fun.params
+        param_types = params.map(&:type).map {|x| @sema.types[x]}
+        decl = @sema.add_function_decl(name, type, param_types)
         unless ast_fun.block.nil?
           sema_fun = @sema.add_function(decl)
           fun_pairs << [sema_fun, ast_fun]
@@ -41,6 +43,9 @@ module Magma
     def build_fun(sema_fun, ast_fun)
       bb = sema_fun.add_basic_block
       var_table = {}
+      ast_fun.params.each_with_index do |param, i|
+        var_table[param.name] = i
+      end
       ast_fun.block.statements.each do |stmt|
         visit(stmt, bb, sema_fun, var_table)
       end
@@ -98,8 +103,11 @@ module Magma
 
     def expr_call(expr, bb, sema_fun, var_table)
       fun_name = expr.name
+      args = expr.arguments.map { |a|
+        visit(a, bb, sema_fun, var_table)
+      }
       decl = @sema.decls_with_name(fun_name).first
-      Sema::Expr.call(decl, [])
+      Sema::Expr.call(decl, args)
     end
   end
 end

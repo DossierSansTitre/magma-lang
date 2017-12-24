@@ -1,11 +1,7 @@
-fun foo() -> Int {
-    var a: Int;
-
-    a = 5;
-    return a;
+fun foo(a: Int) -> Int {
+    return a * a;
 }
 
 fun main() -> Int {
-    foo();
-    return foo();
+    return foo(5);
 }

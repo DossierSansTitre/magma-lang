@@ -40,8 +40,13 @@ module Magma
       block_pairs = []
       llvm_fun = @mod.functions[fun.mangled_name]
       first_block = nil
-      fun.basic_blocks.each do |sema_bb|
-        llvm_bb = llvm_fun.basic_blocks.append
+      fun.basic_blocks.each_with_index do |sema_bb, idx|
+        if idx == 0
+          bb_label = ""
+        else
+          bb_label = "#{fun.name}_#{idx}"
+        end
+        llvm_bb = llvm_fun.basic_blocks.append(bb_label)
         first_block ||= llvm_bb
         bb_table[sema_bb.id] = llvm_bb
         block_pairs << [llvm_bb, sema_bb]
@@ -67,6 +72,13 @@ module Magma
     def generate_basic_block(llvm_bb, sema_bb, sema_fun, bb_table, var_table)
       sema_bb.statements.each do |stmt|
         visit(stmt, llvm_bb, sema_fun, bb_table, var_table)
+      end
+    end
+
+    def statement_cond(stmt, llvm_bb, sema_fun, bb_table, var_table)
+      e = visit(stmt.expr, llvm_bb, sema_fun, bb_table, var_table)
+      llvm_bb.build do |builder|
+        return builder.cond(e, bb_table[stmt.block_true.id], bb_table[stmt.block_false.id])
       end
     end
 

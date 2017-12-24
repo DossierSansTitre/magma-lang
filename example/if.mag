@@ -1,0 +1,14 @@
+fun main() -> Int {
+    var a: Int;
+
+    a = 5;
+
+    if (a < 3)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}

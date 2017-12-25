@@ -99,6 +99,21 @@ module Magma
       var_table[name] = id
     end
 
+    def statement_while(stmt, sema_fun, var_table)
+      cond_block = sema_fun.add_basic_block
+      loop_block = sema_fun.add_basic_block
+      next_block = sema_fun.add_basic_block
+      current_block = @block_stack.pop
+      e = visit(stmt.expr, sema_fun, var_table)
+      cond_block.add_cond(e, loop_block, next_block)
+      current_block.add_jump(cond_block)
+      @block_stack << next_block
+      @block_stack << loop_block
+      stmt.block.statements.each {|s| visit(s, sema_fun, var_table)}
+      loop_block_end = @block_stack.pop
+      loop_block_end.add_jump(cond_block)
+    end
+
     def expr_assign(expr, sema_fun, var_table)
       name = expr.name
       id = var_table[name]

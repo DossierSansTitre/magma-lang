@@ -2,6 +2,7 @@ require 'magma/sema/node'
 require 'magma/sema/statement_cond'
 require 'magma/sema/statement_jump'
 require 'magma/sema/statement_return'
+require 'magma/sema/statement_loop'
 
 module Magma
   module Sema
@@ -30,6 +31,11 @@ module Magma
 
       def add_expr(expr)
         @statements << expr
+      end
+
+      def add_loop(expr, block)
+        @returned = true
+        @exit_statement = StatementLoop.new(expr, block)
       end
 
       def add_cond(expr, block_true, block_false)

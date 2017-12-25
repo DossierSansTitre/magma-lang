@@ -1,0 +1,13 @@
+fun main() -> Int {
+    var i: Int;
+    var acc: Int;
+
+    i = 0;
+    acc = 0;
+    while (i < 5)
+    {
+        acc = acc + i;
+        i = i + 1;
+    }
+    return acc;
+}

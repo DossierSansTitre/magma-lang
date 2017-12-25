@@ -16,6 +16,8 @@ module Magma
       'for'     => :kfor,
       'true'    => :ktrue,
       'false'   => :kfalse,
+      'break'   => :kbreak,
+      'next'    => :knext
     }
 
     SYMBOLS = {

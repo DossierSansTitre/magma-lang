@@ -7,7 +7,6 @@ module Magma
   module Sema
     class BasicBlock < Node
       attr_reader :id
-      attr_reader :statements
 
       def initialize(id)
         @returned = false
@@ -16,13 +15,17 @@ module Magma
         @exit_statement = nil
       end
 
+      def statements
+        @statements + [@exit_statement].reject(&:nil?)
+      end
+
       def returned?
         @returned
       end
 
       def add_return(expr = nil)
         @returned = true
-        @statements << StatementReturn.new(expr)
+        @exit_statement = StatementReturn.new(expr)
       end
 
       def add_expr(expr)
@@ -31,12 +34,14 @@ module Magma
 
       def add_cond(expr, block_true, block_false)
         @returned = true
-        @statements << StatementCond.new(expr, block_true, block_false)
+        @exit_statement = StatementCond.new(expr, block_true, block_false)
       end
 
       def add_jump(block)
-        @returned = true
-        @statements << StatementJump.new(block)
+        unless @returned
+          @returned = true
+          @exit_statement = StatementJump.new(block)
+        end
       end
     end
   end

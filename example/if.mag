@@ -1,13 +1,14 @@
 fun abs(a: Int) -> UInt {
     var b: UInt;
 
-    if (a < 0)
+    b = a;
+    if (a <= 0)
     {
-        b = -a;
-    }
-    else
-    {
-        b = a;
+        if (a == 0)
+        {
+            b = 26;
+        }
+        b = b + 5;
     }
     return b;
 }

@@ -55,34 +55,26 @@ module Magma
     def statement_cond(stmt, sema_fun, var_table)
       e = visit(stmt.expr, sema_fun, var_table)
       block_true = sema_fun.add_basic_block
-      unless stmt.block_false.nil?
+      if stmt.block_false
         block_false = sema_fun.add_basic_block
       end
+      block_next = sema_fun.add_basic_block
       block_current = @block_stack.last
       @block_stack.pop
+      @block_stack << block_next
       @block_stack << block_true
       stmt.block_true.statements.each do |s|
         visit(s, sema_fun, var_table)
       end
-      @block_stack.pop
+      block_true_end = @block_stack.pop
+      block_true_end.add_jump(block_next)
       if block_false
         @block_stack << block_false
         stmt.block_false.statements.each do |s|
           visit(s, sema_fun, var_table)
         end
-        @block_stack.pop
-      end
-      unless block_false && block_true.returned? && block_false.returned?
-        block_next = sema_fun.add_basic_block
-        @block_stack << block_next
-      end
-      if block_true.returned? == false
-        block_true.add_jump(block_next)
-      end
-      if block_false && block_false.returned? == false
-        block_false.add_jump(block_next)
-      end
-      if block_false
+        block_false_end = @block_stack.pop
+        block_false_end.add_jump(block_next)
         block_current.add_cond(e, block_true, block_false)
       else
         block_current.add_cond(e, block_true, block_next)

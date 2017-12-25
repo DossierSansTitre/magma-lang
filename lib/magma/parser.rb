@@ -144,12 +144,18 @@ module Magma
 
     def parse_statement
       statement = nil
+      statement ||= parse_statement_null
       statement ||= parse_statement_cond
       statement ||= parse_statement_while
       statement ||= parse_statement_variable
       statement ||= parse_statement_return
       statement ||= parse_statement_expr
       statement
+    end
+
+    def parse_statement_null
+      accept(:tsemicolon) or return
+      AST::StatementNull.new
     end
 
     def parse_statement_cond

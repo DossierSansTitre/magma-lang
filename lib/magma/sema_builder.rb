@@ -54,6 +54,10 @@ module Magma
       end
     end
 
+    def statement_null(stmt)
+      nil
+    end
+
     def statement_cond(stmt)
       e = visit(stmt.expr)
       block_true = @sema_fun.add_basic_block

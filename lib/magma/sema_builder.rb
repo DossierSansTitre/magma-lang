@@ -120,6 +120,44 @@ module Magma
       loop_block_end.add_jump(cond_block)
     end
 
+    def statement_for(stmt)
+      if stmt.init
+        init = visit(stmt.init)
+      end
+      if stmt.expr
+        expr = visit(stmt.expr)
+      end
+      if stmt.step
+        step = visit(stmt.step)
+      end
+
+      cond_block = @sema_fun.add_basic_block
+      loop_block = @sema_fun.add_basic_block
+      next_block = @sema_fun.add_basic_block
+      current_block = @block_stack.pop
+
+      if init
+        current_block.add_expr(init)
+      end
+
+      if expr
+        cond_block.add_cond(expr, loop_block, next_block)
+      else
+        cond_block.add_jump(loop_block)
+      end
+
+      current_block.add_jump(cond_block)
+      @block_stack << next_block
+      @block_stack << loop_block
+      stmt.block.statements.each {|s| visit(s)}
+      loop_block_end = @block_stack.pop
+      if step
+        loop_block_end.add_expr(step)
+      end
+      loop_block_end.add_jump(cond_block)
+    end
+
+
     def expr_assign(expr)
       name = expr.name
       id = @var_table_stack.last[name]

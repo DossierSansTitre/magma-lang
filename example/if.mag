@@ -1,0 +1,11 @@
+fun abs(a: Int) -> UInt {
+    if (a < 0)
+        return 0;
+    else
+        return 1;
+    return a;
+}
+
+fun main() -> Int {
+    return abs(-5);
+}

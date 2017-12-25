@@ -1,16 +1,9 @@
 fun abs(a: Int) -> UInt {
-    var b: UInt;
-
-    b = a;
-    if (a <= 0)
-    {
-        if (a == 0)
-        {
-            b = 26;
-        }
-        b = b + 5;
-    }
-    return b;
+    if (a < 0)
+        return 0;
+    else
+        return 1;
+    return a;
 }
 
 fun main() -> Int {

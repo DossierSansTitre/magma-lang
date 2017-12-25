@@ -107,6 +107,18 @@ module Magma
       block
     end
 
+    def parse_block_or_statement
+      block = parse_block
+      if block.nil?
+        statement = parse_statement
+        if statement
+          block = AST::Block.new
+          block.add_statement(statement)
+        end
+      end
+      block
+    end
+
     def parse_function
       return unless accept(:kfun)
       id = accept!(:identifier) or return
@@ -144,9 +156,9 @@ module Magma
       accept!(:tlparen) or return
       expr = parse_expr or return
       accept!(:trparen) or return
-      block_true = parse_block or return
+      block_true = parse_block_or_statement or return
       if accept(:kelse)
-        block_false = parse_block
+        block_false = parse_block_or_statement
       end
       AST::StatementCond.new(expr, block_true, block_false)
     end

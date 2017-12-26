@@ -144,11 +144,20 @@ module Magma
 
     def parse_statement
       statement = nil
+      statement ||= parse_statement_null
       statement ||= parse_statement_cond
+      statement ||= parse_statement_while
+      statement ||= parse_statement_for
+      statement ||= parse_statement_loop_control
       statement ||= parse_statement_variable
       statement ||= parse_statement_return
       statement ||= parse_statement_expr
       statement
+    end
+
+    def parse_statement_null
+      accept(:tsemicolon) or return
+      AST::StatementNull.new
     end
 
     def parse_statement_cond
@@ -161,6 +170,39 @@ module Magma
         block_false = parse_block_or_statement
       end
       AST::StatementCond.new(expr, block_true, block_false)
+    end
+
+    def parse_statement_while
+      accept(:kwhile) or return
+      accept!(:tlparen) or return
+      expr = parse_expr or return
+      accept!(:trparen) or return
+      block = parse_block_or_statement or return
+      AST::StatementWhile.new(expr, block)
+    end
+
+    def parse_statement_for
+      accept(:kfor) or return
+      accept!(:tlparen) or return
+      init = parse_expr
+      accept!(:tsemicolon) or return
+      expr = parse_expr
+      accept!(:tsemicolon) or return
+      step = parse_expr
+      accept!(:trparen) or return
+      block = parse_block_or_statement or return
+      AST::StatementFor.new(init, expr, step, block)
+    end
+
+    def parse_statement_loop_control
+      if accept(:kbreak)
+        op = :break
+      elsif accept(:knext)
+        op = :next
+      end
+      return if op.nil?
+      accept!(:tsemicolon) or return
+      AST::StatementLoopControl.new(op)
     end
 
     def parse_statement_variable

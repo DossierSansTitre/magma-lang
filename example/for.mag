@@ -1,9 +1,12 @@
 fun main() -> Int {
-    var i: Int;
     var acc: Int;
+    acc = 1;
 
-    acc = 0;
-    for (i = 0; i < 5; i = i + 1)
-        acc = acc + i;
+    for (;;)
+    {
+        acc = acc * 2;
+        if (acc > 128)
+            break;
+    }
     return acc;
 }

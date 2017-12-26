@@ -44,6 +44,8 @@ module Magma
       @sema_fun = sema_fun
       bb = sema_fun.add_basic_block
       @block_stack = [bb]
+      @block_stack_break = []
+      @block_stack_next = []
       var_table = {}
       ast_fun.params.each_with_index do |param, i|
         var_table[param.name] = i
@@ -109,6 +111,8 @@ module Magma
       cond_block = @sema_fun.add_basic_block
       loop_block = @sema_fun.add_basic_block
       next_block = @sema_fun.add_basic_block
+      @block_stack_break << next_block
+      @block_stack_next << cond_block
       current_block = @block_stack.pop
       e = visit(stmt.expr)
       cond_block.add_cond(e, loop_block, next_block)
@@ -118,6 +122,8 @@ module Magma
       stmt.block.statements.each {|s| visit(s)}
       loop_block_end = @block_stack.pop
       loop_block_end.add_jump(cond_block)
+      @block_stack_break.pop
+      @block_stack_next.pop
     end
 
     def statement_for(stmt)
@@ -133,8 +139,12 @@ module Magma
 
       cond_block = @sema_fun.add_basic_block
       loop_block = @sema_fun.add_basic_block
+      step_block = @sema_fun.add_basic_block
       next_block = @sema_fun.add_basic_block
       current_block = @block_stack.pop
+
+      @block_stack_break << next_block
+      @block_stack_next << cond_block
 
       if init
         current_block.add_expr(init)
@@ -152,11 +162,26 @@ module Magma
       stmt.block.statements.each {|s| visit(s)}
       loop_block_end = @block_stack.pop
       if step
-        loop_block_end.add_expr(step)
+        step_block.add_expr(step)
       end
-      loop_block_end.add_jump(cond_block)
+      step_block.add_jump(cond_block)
+      loop_block_end.add_jump(step_block)
+
+      @block_stack_break.pop
+      @block_stack_next.pop
     end
 
+    def statement_loop_control(stmt)
+      op = stmt.op
+      case op
+      when :break
+        stack = @block_stack_break
+      when :next
+        stack = @block_stack_next
+      end
+      block = stack.last
+      @block_stack.last.add_jump(block)
+    end
 
     def expr_assign(expr)
       name = expr.name

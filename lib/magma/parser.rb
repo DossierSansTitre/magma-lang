@@ -148,6 +148,7 @@ module Magma
       statement ||= parse_statement_cond
       statement ||= parse_statement_while
       statement ||= parse_statement_for
+      statement ||= parse_statement_loop_control
       statement ||= parse_statement_variable
       statement ||= parse_statement_return
       statement ||= parse_statement_expr
@@ -191,6 +192,17 @@ module Magma
       accept!(:trparen) or return
       block = parse_block_or_statement or return
       AST::StatementFor.new(init, expr, step, block)
+    end
+
+    def parse_statement_loop_control
+      if accept(:kbreak)
+        op = :break
+      elsif accept(:knext)
+        op = :next
+      end
+      return if op.nil?
+      accept!(:tsemicolon) or return
+      AST::StatementLoopControl.new(op)
     end
 
     def parse_statement_variable
